@@ -340,27 +340,6 @@ const jobData = {
                 path: ['初级合规专员', '高级合规经理', '合规总监', '首席合规官'],
                 companies: '银行和金融机构、科技、医疗、制造和零售电商行业',
                 cert: 'cfa, frm'
-            },
-            {
-                tier: '后台',
-                title: '基金运营专员',
-                jd: [
-                    '负责基金产品的净值核算与披露，以及交易结算处理与跟踪。',
-                    '撰写系统开发需求并进行测试，参与基金账户管理和运营相关标准化手册设计。',
-                    '负责日常清算资金交收和账务处理，参与资金系统和销售系统参数维护及业务测试。'
-                ],
-                requirements: [
-                    '本科及以上学历，会计、金融、财务、经济相关专业背景。',
-                    '扎实的财会专业知识基础，了解基金相关法律法规，良好的风险防范意识和保密意识。',
-                    '工作细致认真严谨，责任心强，具备团队精神，精通Office等办公及统计软件。',
-                    '编程技术背景或会计/基金从业资格者优先。',
-                    'CFA Level 1/2或FRM Level 1/2的知识背景有助于理解基金产品的复杂性。'
-                ],
-                salary: '1万-1.5万人民币/月',
-                salaryRange: [12, 18],
-                path: ['基层运营', '高级运营专员', '运营主管', '运营经理/部门负责人'],
-                companies: '易方达基金、博时基金、广发基金、南方基金',
-                cert: 'cfa, frm'
             }
         ],
         '券商': [
@@ -510,6 +489,27 @@ const jobData = {
                 path: ['助理角色', '客户经理', '高级客户经理/团队负责人', '企业银行负责人'],
                 companies: '贝莱德、汇丰银行、中国工商银行、中国银行、兴业银行、友邦国际',
                 cert: 'cfa'
+            },
+            {   // Moved from 商业银行
+                tier: '后台',
+                title: '基金运营专员',
+                jd: [
+                    '负责基金产品的净值核算与披露，以及交易结算处理与跟踪。',
+                    '撰写系统开发需求并进行测试，参与基金账户管理和运营相关标准化手册设计。',
+                    '负责日常清算资金交收和账务处理，参与资金系统和销售系统参数维护及业务测试。'
+                ],
+                requirements: [
+                    '本科及以上学历，会计、金融、财务、经济相关专业背景。',
+                    '扎实的财会专业知识基础，了解基金相关法律法规，良好的风险防范意识和保密意识。',
+                    '工作细致认真严谨，责任心强，具备团队精神，精通Office等办公及统计软件。',
+                    '编程技术背景或会计/基金从业资格者优先。',
+                    'CFA Level 1/2或FRM Level 1/2的知识背景有助于理解基金产品的复杂性。'
+                ],
+                salary: '1万-1.5万人民币/月',
+                salaryRange: [12, 18],
+                path: ['基层运营', '高级运营专员', '运营主管', '运营经理/部门负责人'],
+                companies: '易方达基金、博时基金、广发基金、南方基金',
+                cert: 'cfa, frm'
             }
         ],
         '互联网金融': [
@@ -795,7 +795,7 @@ const jobData = {
                 title: '数据科学家/风控建模师',
                 jd: [
                     '利用机器学习、深度学习等算法构建信用评分、反欺诈、营销响应等模型。',
-                    '负责模型的开发、部署、监控和迭代优化。',
+                    '负责模型的开发、部署、监控和迭代优化。' ,
                     '深入分析海量数据，洞察业务机会和风险点。'
                 ],
                 requirements: [
@@ -1176,14 +1176,14 @@ function closeModal() {
     }, 300);
 }
 
-closeModalBtn.addEventListener('click', closeModal);
-modal.addEventListener('click', (e) => {
+closeModalBtn。addEventListener('click'， closeModal);
+modal。addEventListener('click'， (e) => {
     if (e.target === modal) {
         closeModal();
     }
 });
 
-document.addEventListener('DOMContentLoaded', initialize);
+document。addEventListener('DOMContentLoaded'， initialize);
 </script>
 
 </body>
