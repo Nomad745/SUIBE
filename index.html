@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2025届上海对外经贸大学毕业生就业指南</title>
+    <!-- 引入 Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入 Google Fonts (Noto Sans SC) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Warm Harmony (Background: gray-50, Text: gray-800, Primary Accent: blue-800, Secondary Accent: blue-500, Highlight: orange-500) -->
+    
+    <!-- 自定义样式 -->
     <style>
         body {
             font-family: 'Noto Sans SC', sans-serif;
@@ -27,7 +31,7 @@
             font-weight: 600;
         }
 
-        /* Glassmorphism effect */
+        /* 玻璃拟态效果 */
         .glass-card {
             background-color: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(12px);
@@ -36,7 +40,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        /* Button filter styles */
+        /* 按钮筛选样式 */
         .nav-button, .industry-tag {
             transition: all 0.3s ease;
             border: 1px solid #d1d5db; /* gray-300 */
@@ -56,21 +60,24 @@
             color: #1e3a8a;
         }
 
+        /* 职位卡片样式 */
         .job-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); /* Adjusted initial shadow for better visibility */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); /* 调整初始阴影以获得更好的可见性 */
         }
         .job-card:hover {
             transform: translateY(-6px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.08);
         }
+        /* 模态框动画 */
         #modal {
             transition: opacity 0.3s ease-in-out;
         }
         #modal-content {
             transition: transform 0.3s ease-in-out;
         }
+        /* 图表容器样式 */
         .chart-container {
             position: relative;
             margin: auto;
@@ -84,6 +91,7 @@
                 height: 400px;
             }
         }
+        /* 发展路径步骤样式 */
         .path-step-item {
             background-color: #e0e7ff; /* indigo-100 */
             color: #1e3a8a; /* Primary Accent Blue */
@@ -100,6 +108,7 @@
             font-size: 1.1rem;
             flex-shrink: 0;
         }
+        /* 职位卡片标题截断 */
         .job-card h4 {
             white-space: nowrap;
             overflow: hidden;
@@ -110,6 +119,7 @@
             white-space: nowrap;
             flex-shrink: 0;
         }
+        /* 职位卡片内容截断 */
         .job-card .jd-content,
         .job-card .requirements-content,
         .job-card .path-content {
@@ -121,6 +131,7 @@
             -webkit-box-orient: vertical;
             line-height: 1.4;
         }
+        /* 发展路径内容布局 */
         .job-card .path-content {
             display: flex;
             flex-wrap: wrap;
@@ -170,7 +181,7 @@
             </section>
 
             <section id="industry-tags" class="mb-8 text-center space-x-2 space-y-2">
-                <!-- Industry tags will be rendered here by JavaScript -->
+                <!-- 行业标签将由JavaScript在此处渲染 -->
             </section>
 
             <section id="job-postings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -214,7 +225,7 @@
         </footer>
     </div>
 
-    <!-- Modal -->
+    <!-- 模态框 -->
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4 hidden opacity-0">
         <div id="modal-content" class="glass-card rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform scale-95">
             <div class="sticky top-0 bg-white/80 backdrop-blur-sm p-4 sm:p-6 border-b border-gray-200 flex justify-between items-center z-10">
@@ -223,7 +234,7 @@
             </div>
             <div class="p-4 sm:p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Left Column -->
+                    <!-- 左侧列 -->
                     <div>
                         <div class="mb-6">
                             <h3 class="font-bold text-lg mb-2 border-l-4 border-secondary-accent pl-3">岗位职责 (JD)</h3>
@@ -238,7 +249,7 @@
                             <div id="modal-path" class="flex flex-wrap items-center text-sm"></div>
                         </div>
                     </div>
-                    <!-- Right Column -->
+                    <!-- 右侧列 -->
                     <div>
                          <div class="mb-6 glass-card p-4 rounded-lg">
                             <h3 class="font-bold text-lg mb-3 border-l-4 border-secondary-accent pl-3">薪酬水平参考</h3>
@@ -258,6 +269,7 @@
     </div>
 
 <script>
+// 职位数据
 const jobData = {
     finance: {
         '商业银行': [
@@ -277,7 +289,7 @@ const jobData = {
                 salaryRange: [12, 25],
                 path: ['轮岗学习', '定岗', '业务专家/团队经理', '部门/支行负责人'],
                 companies: '招商银行、汇丰中国、工商银行',
-                cert: 'none'
+                cert: [] // 无特定证书要求，使用空数组表示
             },
             {
                 tier: '中台',
@@ -297,7 +309,7 @@ const jobData = {
                 salaryRange: [44.2, 66.3],
                 path: ['初级分析师', '高级分析师', '信用风险经理', '部门主管'],
                 companies: '中国银行、中诚信国际、中证鹏元',
-                cert: 'cfa, frm'
+                cert: ['cfa', 'frm']
             },
             {
                 tier: '中台',
@@ -318,7 +330,7 @@ const jobData = {
                 salaryRange: [55, 75],
                 path: ['初级分析师', '高级分析师', '风险总监', '首席风险官'],
                 companies: '对冲基金、资产管理公司、私募股权公司、投资银行、汇丰银行',
-                cert: 'frm, cfa'
+                cert: ['frm', 'cfa']
             },
             {
                 tier: '中台',
@@ -339,7 +351,7 @@ const jobData = {
                 salaryRange: [40, 100],
                 path: ['初级合规专员', '高级合规经理', '合规总监', '首席合规官'],
                 companies: '银行和金融机构、科技、医疗、制造和零售电商行业',
-                cert: 'cfa, frm'
+                cert: ['cfa', 'frm']
             }
         ],
         '券商': [
@@ -361,7 +373,7 @@ const jobData = {
                 salaryRange: [25, 60],
                 path: ['分析师(Analyst)', '经理(Associate)', '副总裁(VP)', '董事总经理(MD)'],
                 companies: '中金公司、中信证券、华泰证券',
-                cert: 'cfa'
+                cert: ['cfa']
             },
             {
                 tier: '前台',
@@ -383,7 +395,7 @@ const jobData = {
                 salaryRange: [55.1, 156.2],
                 path: ['助理研究员', '行业研究员', '资深研究员', '研究总监/首席策略师'],
                 companies: '摩根士丹利、国泰君安证券',
-                cert: 'cfa'
+                cert: ['cfa']
             },
             {
                 tier: '前台',
@@ -402,7 +414,7 @@ const jobData = {
                 salaryRange: [44.2, 71.8],
                 path: ['交易助理/初级交易员', '资深交易员', '交易主管', '投资组合经理/基金经理'],
                 companies: '摩根士丹利、中国建设银行、中国银行、中信证券、国泰君安期货',
-                cert: 'cfa, frm'
+                cert: ['cfa', 'frm']
             },
             {
                 tier: '中台',
@@ -423,7 +435,7 @@ const jobData = {
                 salaryRange: [30, 100],
                 path: ['数据分析和模型实现', '开发复杂模型', '领导团队', '推动战略决策'],
                 companies: '摩根士丹利、中金公司、华泰证券、国泰君安期货',
-                cert: 'cfa, frm'
+                cert: ['cfa', 'frm']
             }
         ],
         '基金': [
@@ -444,7 +456,7 @@ const jobData = {
                 salaryRange: [50, 200],
                 path: ['研究员', '基金经理助理', '基金经理', '投研总监'],
                 companies: '南方基金、华安基金、博道基金',
-                cert: 'cfa'
+                cert: ['cfa']
             },
             {
                 tier: '中台',
@@ -463,7 +475,7 @@ const jobData = {
                 salaryRange: [20, 40],
                 path: ['初级研究员', '高级研究员', '资深研究员', '基金经理/投研总监'],
                 companies: '易方达基金、嘉实基金、景顺长城',
-                cert: 'cfa'
+                cert: ['cfa']
             },
             {
                 tier: '前台',
@@ -488,9 +500,9 @@ const jobData = {
                 salaryRange: [12, 66.3],
                 path: ['助理角色', '客户经理', '高级客户经理/团队负责人', '企业银行负责人'],
                 companies: '贝莱德、汇丰银行、中国工商银行、中国银行、兴业银行、友邦国际',
-                cert: 'cfa'
+                cert: ['cfa']
             },
-            {   // Moved from 商业银行
+            {   
                 tier: '后台',
                 title: '基金运营专员',
                 jd: [
@@ -509,7 +521,7 @@ const jobData = {
                 salaryRange: [12, 18],
                 path: ['基层运营', '高级运营专员', '运营主管', '运营经理/部门负责人'],
                 companies: '易方达基金、博时基金、广发基金、南方基金',
-                cert: 'cfa, frm'
+                cert: ['cfa', 'frm']
             }
         ],
         '互联网金融': [
@@ -530,7 +542,7 @@ const jobData = {
                 salaryRange: [25, 70],
                 path: ['产品专员', '产品经理', '高级产品经理', '产品总监'],
                 companies: '蚂蚁集团、腾讯金融、微众银行',
-                cert: 'none'
+                cert: []
             }
         ],
         '四大咨询': [
@@ -551,7 +563,7 @@ const jobData = {
                 salaryRange: [15, 40],
                 path: ['分析师', '咨询顾问', '高级顾问', '项目经理/合伙人'],
                 companies: '普华永道、德勤、安永、毕马威',
-                cert: 'cfa, frm'
+                cert: ['cfa', 'frm']
             }
         ],
         'ESG': [
@@ -574,7 +586,7 @@ const jobData = {
                 salaryRange: [20, 100],
                 path: ['助理分析师', 'ESG分析师', '高级分析师', 'ESG研究/投资总监'],
                 companies: '私募股权公司、资产管理公司、银行、咨询公司、财富管理公司、鼎力公司、基金公司',
-                cert: 'cfa'
+                cert: ['cfa']
             },
             {
                 tier: '中台',
@@ -596,7 +608,7 @@ const jobData = {
                 salaryRange: [65.2, 90],
                 path: ['支持ESG数据分析和报告撰写', '可持续金融产品开发', '战略制定和利益相关者沟通'],
                 companies: '鼎力公司、MultiplyMii、资产管理公司、银行、咨询公司',
-                cert: 'cfa'
+                cert: ['cfa']
             }
         ]
     },
@@ -620,7 +632,7 @@ const jobData = {
                 salaryRange: [7, 69.3],
                 path: ['执行岗位', '部门主管/高级管理岗位', '高级交易员/管理岗位', '期货交易员/期货交易管理岗位'],
                 companies: '天津世纪五矿贸易有限公司、中粮集团、中国中化',
-                cert: 'none'
+                cert: []
             },
             {
                 tier: '中台',
@@ -639,7 +651,7 @@ const jobData = {
                 salaryRange: [66.7, 90],
                 path: ['初级岗位', '高级专员', '贸易金融经理', '部门负责人'],
                 companies: '商业银行（如中国银行、汇丰银行）、大型贸易公司、供应链金融公司',
-                cert: 'none'
+                cert: []
             },
             {
                 tier: '后台',
@@ -659,7 +671,7 @@ const jobData = {
                 salaryRange: [4.5, 9.6],
                 path: ['初级分析师', '高级分析师', '供应链经理', '供应链总监'],
                 companies: '京东物流、菜鸟网络、中远海运、顺丰速运、华为、宝洁',
-                cert: 'none'
+                cert: []
             }
         ],
         '跨境电商': [
@@ -684,7 +696,7 @@ const jobData = {
                 salaryRange: [6, 18],
                 path: ['基层运营', '高级运营专员', '运营主管', '运营经理/部门负责人'],
                 companies: '京东国际、阿里巴巴国际站、拼多多、常熟伊斯格进出口有限公司、北京亿昌传媒科技有限公司',
-                cert: 'none'
+                cert: []
             }
         ]
     },
@@ -707,7 +719,7 @@ const jobData = {
                 salaryRange: [30, 100],
                 path: ['初级量化研究员', '量化研究员', '资深研究员', '量化投资经理'],
                 companies: '中信证券、华泰证券、幻方量化',
-                cert: 'cfa, frm' // Added for consistency
+                cert: ['cfa', 'frm'] 
             },
             {
                 tier: '中后台',
@@ -726,7 +738,7 @@ const jobData = {
                 salaryRange: [25, 60],
                 path: ['风控专员', '量化风控经理', '高级经理', '风控总监'],
                 companies: '国泰君安、海通证券、头部私募',
-                cert: 'frm' // Added for consistency
+                cert: ['frm'] 
             }
         ],
         '基金': [
@@ -747,7 +759,7 @@ const jobData = {
                 salaryRange: [30, 100],
                 path: ['初级量化研究员', '量化研究员', '资深研究员', '量化投资经理'],
                 companies: '博时基金、华夏基金、进化论资产',
-                cert: 'cfa, frm' // Added for consistency
+                cert: ['cfa', 'frm'] 
             },
             {
                 tier: '中后台',
@@ -765,7 +777,7 @@ const jobData = {
                 salaryRange: [15, 30],
                 path: ['风险监督员', '风控分析员', '策略审核岗', '运营管理'],
                 companies: '博时基金、大型公募基金',
-                cert: 'frm' // Added for consistency
+                cert: ['frm'] 
             }
         ],
         '商业银行': [
@@ -786,7 +798,7 @@ const jobData = {
                 salaryRange: [15, 40],
                 path: ['数据分析师', '高级数据分析师', '数据科学家', '数据部门负责人'],
                 companies: '招商银行、平安银行、浦发银行',
-                cert: 'cfa, frm' // Added for consistency
+                cert: ['cfa', 'frm'] 
             }
         ],
         '互联网金融': [
@@ -807,7 +819,7 @@ const jobData = {
                 salaryRange: [35, 80],
                 path: ['算法工程师', '数据科学家', '资深数据科学家', '首席科学家'],
                 companies: '蚂蚁集团、微众银行、京东科技',
-                cert: 'cfa, frm' // Added for consistency
+                cert: ['cfa', 'frm'] 
             }
         ],
         '四大咨询': [
@@ -828,7 +840,7 @@ const jobData = {
                 salaryRange: [18, 45],
                 path: ['分析师', '咨询顾问', '高级顾问', '项目经理/合伙人'],
                 companies: '普华永道、德勤、安永、毕马威',
-                cert: 'cfa, frm' // Added for consistency
+                cert: ['cfa', 'frm'] 
             }
         ]
     }
@@ -837,190 +849,226 @@ const jobData = {
 const collegeSelector = document.getElementById('college-selector');
 const industryTagsContainer = document.getElementById('industry-tags');
 const jobPostingsContainer = document.getElementById('job-postings');
-let salaryChart = null;
+let salaryChart = null; // 用于全局薪资图表实例
 
-let currentCollege = 'finance';
-let currentIndustry = 'all'; // Default to 'all' industries
+let currentCollege = 'finance'; // 当前选中的学院
+let currentIndustry = 'all'; // 当前选中的行业，默认为“所有行业”
 
+/**
+ * 渲染行业标签
+ */
 function renderIndustryTags() {
-    const industries = Object.keys(jobData[currentCollege]);
-    industryTagsContainer.innerHTML = `<button class="industry-tag inline-block font-medium py-2 px-4 rounded-full shadow-sm hover:bg-blue-100 transition duration-300" data-industry="all">所有行业</button>` + industries.map(industry => `
-        <button class="industry-tag inline-block font-medium py-2 px-4 rounded-full shadow-sm hover:bg-blue-100 transition duration-300" data-industry="${industry}">
-            ${industry}
-        </button>
-    `).join('');
-    
-    industryTagsContainer.querySelectorAll('.industry-tag').forEach(tag => {
-        tag.addEventListener('click', () => {
-            currentIndustry = tag.dataset.industry;
-            updateActiveStates();
-            renderJobPostings();
-        });
-    });
-}
-
-function renderJobPostings() {
-    let postings = [];
-    if (currentIndustry === 'all') {
-        for (const industry in jobData[currentCollege]) {
-            postings = postings.concat(jobData[currentCollege][industry]);
-        }
-    } else {
-        postings = jobData[currentCollege][currentIndustry] || [];
-    }
-
-    jobPostingsContainer.innerHTML = '';
-    
-    postings.forEach(job => {
-        const card = document.createElement('div');
-        card.className = 'job-card glass-card rounded-xl overflow-hidden flex flex-col fade-in';
-        card.dataset.jobTitle = job.title;
-
-        let certHtml = '';
-        if (job.cert) { // Check if cert field exists
-            if (job.cert.includes('cfa')) {
-                certHtml += `<span class="highlight-tag text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">CFA优先</span>`;
-            }
-            if (job.cert.includes('frm')) {
-                certHtml += `<span class="highlight-tag text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">FRM优先</span>`;
-            }
-        }
-
-        const jdContent = Array.isArray(job.jd) ? job.jd.map(item => `<p>${item}</p>`).join('') : `<p>${job.jd}</p>`;
-        const requirementsContent = Array.isArray(job.requirements) ? job.requirements.map(item => `<p>${item}</p>`).join('') : `<p>${job.requirements}</p>`;
-        const pathContent = job.path.map((step, index) => `
-            <span class="path-step-item">${step}</span>
-            ${index < job.path.length - 1 ? '<span class="path-arrow">→</span>' : ''}
+    try {
+        const industries = Object.keys(jobData[currentCollege]);
+        industryTagsContainer.innerHTML = `
+            <button class="industry-tag inline-block font-medium py-2 px-4 rounded-full shadow-sm hover:bg-blue-100 transition duration-300" data-industry="all">所有行业</button>
+            ` + industries.map(industry => `
+            <button class="industry-tag inline-block font-medium py-2 px-4 rounded-full shadow-sm hover:bg-blue-100 transition duration-300" data-industry="${industry}">
+                ${industry}
+            </button>
         `).join('');
-
-        card.innerHTML = `
-            <div class="p-5 flex-grow">
-                <div class="flex justify-between items-start mb-2">
-                    <h4 class="text-lg font-bold text-gray-800">${job.title}</h4>
-                    <span class="text-xs font-semibold ${job.tier === '前台' ? 'bg-orange-200 text-orange-800' : (job.tier === '中台' || job.tier === '中后台' ? 'bg-blue-200 text-blue-800' : 'bg-gray-300 text-gray-800')} py-1 px-3 rounded-full shadow-sm whitespace-nowrap">${job.tier}</span>
-                </div>
-                <p class="text-gray-500 font-semibold mb-3 text-sm">${job.companies}</p>
-                <div class="flex flex-wrap gap-1 mb-4">
-                    ${certHtml}
-                </div>
-
-                <div class="mb-3">
-                    <h5 class="font-bold text-gray-700 text-sm mb-1">岗位职责 (JD)</h5>
-                    <div class="jd-content text-sm text-gray-600">${jdContent}</div>
-                </div>
-
-                <div class="mb-3">
-                    <h5 class="font-bold text-gray-700 text-sm mb-1">能力要求</h5>
-                    <div class="requirements-content text-sm text-gray-600">${requirementsContent}</div>
-                </div>
-                
-                <div class="mb-3">
-                    <h5 class="font-bold text-gray-700 text-sm mb-1">发展路径</h5>
-                    <div class="path-content flex flex-wrap items-center text-sm text-primary-accent">
-                        ${pathContent}
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 p-4 text-center border-t border-gray-200 mt-auto">
-                <span class="text-md font-bold text-primary-accent">${job.salary}</span>
-            </div>
-        `;
-        jobPostingsContainer.appendChild(card);
-    });
-}
-
-
-function renderSalaryChart() {
-    const ctx = document.getElementById('salaryChart').getContext('2d');
-    const collegeData = jobData[currentCollege];
-    let chartData = [];
-
-    for (const industry in collegeData) {
-        collegeData[industry].forEach(job => {
-            chartData.push({
-                label: `${job.title} (${industry})`,
-                data: job.salaryRange,
+        
+        // 为每个行业标签添加点击事件监听器
+        industryTagsContainer.querySelectorAll('.industry-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                currentIndustry = tag.dataset.industry;
+                updateActiveStates(); // 更新激活状态
+                renderJobPostings(); // 重新渲染职位列表
             });
         });
+    } catch (error) {
+        console.error("渲染行业标签时出错:", error);
     }
+}
 
-    chartData.sort((a, b) => a.data[0] - b.data[0]);
+/**
+ * 渲染职位列表
+ */
+function renderJobPostings() {
+    try {
+        let postings = [];
+        if (currentIndustry === 'all') {
+            // 如果选中“所有行业”，则合并所有行业的职位
+            for (const industry in jobData[currentCollege]) {
+                postings = postings.concat(jobData[currentCollege][industry]);
+            }
+        } else {
+            // 否则只显示选中行业的职位
+            postings = jobData[currentCollege][currentIndustry] || [];
+        }
 
-    if(salaryChart) {
-        salaryChart.destroy();
-    }
-    
-    salaryChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: chartData.map(d => d.label.length > 16 ? d.label.substring(0, 15) + '...' : d.label),
-            datasets: [{
-                label: '最低年薪 (万)',
-                data: chartData.map(d => d.data[0]),
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                borderColor: 'rgba(59, 130, 246, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            },
-            {
-                label: '最高年薪 (万)',
-                data: chartData.map(d => d.data[1] - d.data[0]),
-                backgroundColor: 'rgba(30, 58, 138, 0.7)',
-                borderColor: 'rgba(30, 58, 138, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    stacked: true,
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: '年薪范围 (万元)',
-                        font: { size: 14, weight: 'bold' }
-                    }
-                },
-                y: {
-                    stacked: true,
-                    ticks: {
-                        font: { size: 12 }
-                    }
+        jobPostingsContainer.innerHTML = ''; // 清空现有职位列表
+        
+        // 遍历职位数据并创建卡片
+        postings.forEach(job => {
+            const card = document.createElement('div');
+            card.className = 'job-card glass-card rounded-xl overflow-hidden flex flex-col fade-in';
+            card.dataset.jobTitle = job.title; // 用于模态框识别
+
+            let certHtml = '';
+            // 检查是否有证书要求并生成HTML
+            if (job.cert && Array.isArray(job.cert)) { 
+                if (job.cert.includes('cfa')) {
+                    certHtml += `<span class="highlight-tag text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">CFA优先</span>`;
                 }
+                if (job.cert.includes('frm')) {
+                    certHtml += `<span class="highlight-tag text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">FRM优先</span>`;
+                }
+            }
+
+            // 格式化岗位职责、能力要求和发展路径
+            const jdContent = Array.isArray(job.jd) ? job.jd.map(item => `<p>${item}</p>`).join('') : `<p>${job.jd}</p>`;
+            const requirementsContent = Array.isArray(job.requirements) ? job.requirements.map(item => `<p>${item}</p>`).join('') : `<p>${job.requirements}</p>`;
+            const pathContent = job.path.map((step, index) => `
+                <span class="path-step-item">${step}</span>
+                ${index < job.path.length - 1 ? '<span class="path-arrow">→</span>' : ''}
+            `).join('');
+
+            card.innerHTML = `
+                <div class="p-5 flex-grow">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-lg font-bold text-gray-800">${job.title}</h4>
+                        <span class="text-xs font-semibold ${job.tier === '前台' ? 'bg-orange-200 text-orange-800' : (job.tier === '中台' || job.tier === '中后台' ? 'bg-blue-200 text-blue-800' : 'bg-gray-300 text-gray-800')} py-1 px-3 rounded-full shadow-sm whitespace-nowrap">${job.tier}</span>
+                    </div>
+                    <p class="text-gray-500 font-semibold mb-3 text-sm">${job.companies}</p>
+                    <div class="flex flex-wrap gap-1 mb-4">
+                        ${certHtml}
+                    </div>
+
+                    <div class="mb-3">
+                        <h5 class="font-bold text-gray-700 text-sm mb-1">岗位职责 (JD)</h5>
+                        <div class="jd-content text-sm text-gray-600">${jdContent}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5 class="font-bold text-gray-700 text-sm mb-1">能力要求</h5>
+                        <div class="requirements-content text-sm text-gray-600">${requirementsContent}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5 class="font-bold text-gray-700 text-sm mb-1">发展路径</h5>
+                        <div class="path-content flex flex-wrap items-center text-sm text-primary-accent">
+                            ${pathContent}
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-4 text-center border-t border-gray-200 mt-auto">
+                    <span class="text-md font-bold text-primary-accent">${job.salary}</span>
+                </div>
+            `;
+            jobPostingsContainer.appendChild(card);
+        });
+    } catch (error) {
+        console.error("渲染职位列表时出错:", error);
+    }
+}
+
+/**
+ * 渲染薪资图表
+ */
+function renderSalaryChart() {
+    try {
+        const ctx = document.getElementById('salaryChart').getContext('2d');
+        const collegeData = jobData[currentCollege];
+        let chartData = [];
+
+        // 收集所有职位的薪资数据
+        for (const industry in collegeData) {
+            collegeData[industry].forEach(job => {
+                chartData.push({
+                    label: `${job.title} (${industry})`,
+                    data: job.salaryRange,
+                });
+            });
+        }
+
+        // 按最低薪资排序
+        chartData.sort((a, b) => a.data[0] - b.data[0]);
+
+        // 如果图表已存在，则销毁旧实例
+        if(salaryChart) {
+            salaryChart.destroy();
+        }
+        
+        // 创建新的薪资图表
+        salaryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.map(d => d.label.length > 16 ? d.label.substring(0, 15) + '...' : d.label), // 截断过长标签
+                datasets: [{
+                    label: '最低年薪 (万)',
+                    data: chartData.map(d => d.data[0]),
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                },
+                {
+                    label: '最高年薪 (万)',
+                    data: chartData.map(d => d.data[1] - d.data[0]), // 计算薪资范围的差值
+                    backgroundColor: 'rgba(30, 58, 138, 0.7)',
+                    borderColor: 'rgba(30, 58, 138, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }]
             },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        font: { size: 12 }
+            options: {
+                indexAxis: 'y', // 横向柱状图
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: true, // 堆叠柱状图
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '年薪范围 (万元)',
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: {
+                            font: { size: 12 }
+                        }
                     }
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.dataset.label || '';
-                            const low = context.chart.data.datasets[0].data[context.dataIndex];
-                            const high = context.chart.data.datasets[1].data[context.dataIndex] + low;
-                            return `${context.chart.data.labels[context.dataIndex]}: ${low} - ${high}万`;
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const low = context.chart.data.datasets[0].data[context.dataIndex];
+                                const high = context.chart.data.datasets[1].data[context.dataIndex] + low;
+                                return `${context.chart.data.labels[context.dataIndex]}: ${low} - ${high}万`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error("渲染薪资图表时出错:", error);
+    }
 }
 
-
+/**
+ * 更新学院和行业按钮的激活状态
+ */
 function updateActiveStates() {
+    // 更新学院按钮状态
     document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
     if (document.getElementById(`btn-${currentCollege}`)) {
         document.getElementById(`btn-${currentCollege}`).classList.add('active');
     }
 
+    // 更新行业标签状态
     document.querySelectorAll('.industry-tag').forEach(tag => {
         if (tag.dataset.industry === currentIndustry) {
             tag.classList.add('active');
@@ -1030,159 +1078,197 @@ function updateActiveStates() {
     });
 }
 
+/**
+ * 页面初始化函数
+ */
 function initialize() {
-    collegeSelector.addEventListener('click', (e) => {
-        const button = e.target.closest('.nav-button');
-        if (!button) return;
+    try {
+        // 学院选择器点击事件
+        collegeSelector.addEventListener('click', (e) => {
+            const button = e.target.closest('.nav-button');
+            if (!button) return;
 
-        const collegeMap = {
-            'btn-finance': 'finance',
-            'btn-intltrade': 'intltrade',
-            'btn-statistics': 'statistics'
-        };
-        currentCollege = collegeMap[button.id];
-        
-        currentIndustry = 'all'; // Reset industry filter to 'all' when college changes
-        
+            const collegeMap = {
+                'btn-finance': 'finance',
+                'btn-intltrade': 'intltrade',
+                'btn-statistics': 'statistics'
+            };
+            currentCollege = collegeMap[button.id];
+            
+            currentIndustry = 'all'; // 切换学院时重置行业筛选为“所有行业”
+            
+            renderIndustryTags();
+            updateActiveStates();
+            renderJobPostings();
+            renderSalaryChart();
+        });
+
+        // 初始渲染
         renderIndustryTags();
         updateActiveStates();
         renderJobPostings();
         renderSalaryChart();
-    });
 
-    // Initial render
-    renderIndustryTags();
-    updateActiveStates();
-    renderJobPostings();
-    renderSalaryChart();
-
-    jobPostingsContainer.addEventListener('click', (e) => {
-        const card = e.target.closest('.job-card');
-        if (card) {
-            const jobTitle = card.dataset.jobTitle;
-            let job = null;
-            
-            for (const industry in jobData[currentCollege]) {
-                const foundJob = jobData[currentCollege][industry].find(j => j.title === jobTitle);
-                if (foundJob) {
-                    job = foundJob;
-                    break;
+        // 职位卡片点击事件，打开模态框
+        jobPostingsContainer.addEventListener('click', (e) => {
+            const card = e.target.closest('.job-card');
+            if (card) {
+                const jobTitle = card.dataset.jobTitle;
+                let job = null;
+                
+                // 从当前学院的所有行业中查找匹配的职位
+                for (const industry in jobData[currentCollege]) {
+                    const foundJob = jobData[currentCollege][industry].find(j => j.title === jobTitle);
+                    if (foundJob) {
+                        job = foundJob;
+                        break;
+                    }
+                }
+                
+                if (job) {
+                    openModal(job);
                 }
             }
-            
-            if (job) {
-                openModal(job);
-            }
-        }
-    });
+        });
+    } catch (error) {
+        console.error("初始化页面时出错:", error);
+    }
 }
 
+// 模态框相关元素
 const modal = document.getElementById('modal');
 const modalContent = document.getElementById('modal-content');
 const closeModalBtn = document.getElementById('close-modal');
-let modalSalaryChart = null;
+let modalSalaryChart = null; // 用于模态框内的薪资图表实例
 
+/**
+ * 打开模态框并显示职位详情
+ * @param {Object} job - 职位数据对象
+ */
 function openModal(job) {
-    document.getElementById('modal-title').textContent = job.title;
-    document.getElementById('modal-jd').innerHTML = Array.isArray(job.jd) ? job.jd.map(item => `<p>${item}</p>`).join('') : `<p>${job.jd}</p>`;
-    document.getElementById('modal-salary-text').textContent = `年薪范围: ${job.salary}`;
-    document.getElementById('modal-companies').textContent = job.companies;
+    try {
+        document.getElementById('modal-title').textContent = job.title;
+        document.getElementById('modal-jd').innerHTML = Array.isArray(job.jd) ? job.jd.map(item => `<p>${item}</p>`).join('') : `<p>${job.jd}</p>`;
+        document.getElementById('modal-salary-text').textContent = `年薪范围: ${job.salary}`;
+        document.getElementById('modal-companies').textContent = job.companies;
 
-    const skillsContainer = document.getElementById('modal-skills');
-    skillsContainer.innerHTML = job.requirements.map(skill => {
-        const isCert = skill.toLowerCase().includes('cfa') || skill.toLowerCase().includes('frm');
-        return `<span class="px-3 py-1 text-xs rounded-full shadow-sm ${isCert ? 'bg-primary-accent text-white font-bold' : 'bg-gray-200 text-gray-700'}">${skill}</span>`;
-    }).join('');
+        const skillsContainer = document.getElementById('modal-skills');
+        skillsContainer.innerHTML = job.requirements.map(skill => {
+            // 判断是否为证书，以便高亮显示
+            const isCert = skill.toLowerCase().includes('cfa') || skill.toLowerCase().includes('frm');
+            return `<span class="px-3 py-1 text-xs rounded-full shadow-sm ${isCert ? 'bg-primary-accent text-white font-bold' : 'bg-gray-200 text-gray-700'}">${skill}</span>`;
+        }).join('');
 
-    const pathContainer = document.getElementById('modal-path');
-    pathContainer.innerHTML = job.path.map((step, index) => `
-        <span class="path-step-item">${step}</span>
-        ${index < job.path.length - 1 ? '<span class="path-arrow">→</span>' : ''}
-    `).join('');
+        const pathContainer = document.getElementById('modal-path');
+        pathContainer.innerHTML = job.path.map((step, index) => `
+            <span class="path-step-item">${step}</span>
+            ${index < job.path.length - 1 ? '<span class="path-arrow">→</span>' : ''}
+        `).join('');
 
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        modalContent.classList.remove('scale-95');
-    }, 10);
-    document.body.style.overflow = 'hidden';
+        modal.classList.remove('hidden');
+        // 使用setTimeout确保动画效果
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-95');
+        }, 10);
+        document.body.style.overflow = 'hidden'; // 禁用背景滚动
 
-    renderModalSalaryChart(job);
+        renderModalSalaryChart(job); // 渲染模态框内的薪资图表
+    } catch (error) {
+        console.error("打开模态框时出错:", error);
+    }
 }
 
+/**
+ * 渲染模态框内的薪资图表
+ * @param {Object} job - 职位数据对象
+ */
 function renderModalSalaryChart(job) {
-    const ctx = document.getElementById('modal-salary-chart').getContext('2d');
-    
-    if (modalSalaryChart) {
-        modalSalaryChart.destroy();
-    }
-    
-    modalSalaryChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['年薪范围 (万元)'],
-            datasets: [{
-                label: '最低年薪',
-                data: [job.salaryRange[0]],
-                backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                borderColor: 'rgba(59, 130, 246, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            }, {
-                label: '薪资上限',
-                data: [job.salaryRange[1] - job.salaryRange[0]],
-                backgroundColor: 'rgba(30, 58, 138, 0.6)',
-                borderColor: 'rgba(30, 58, 138, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    stacked: true,
-                    title: { display: true, text: '年薪 (万元)' }
-                },
-                y: {
-                    stacked: true
-                }
+    try {
+        const ctx = document.getElementById('modal-salary-chart').getContext('2d');
+        
+        // 如果图表已存在，则销毁旧实例
+        if (modalSalaryChart) {
+            modalSalaryChart.destroy();
+        }
+        
+        // 创建新的模态框薪资图表
+        modalSalaryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['年薪范围 (万元)'],
+                datasets: [{
+                    label: '最低年薪',
+                    data: [job.salaryRange[0]],
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }, {
+                    label: '薪资上限',
+                    data: [job.salaryRange[1] - job.salaryRange[0]],
+                    backgroundColor: 'rgba(30, 58, 138, 0.6)',
+                    borderColor: 'rgba(30, 58, 138, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }]
             },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const low = context.chart.data.datasets[0].data[0];
-                            const high = context.chart.data.datasets[1].data[0] + low;
-                            return `范围: ${low} - ${high}万元`;
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        stacked: true,
+                        title: { display: true, text: '年薪 (万元)' }
+                    },
+                    y: {
+                        stacked: true
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const low = context.chart.data.datasets[0].data[0];
+                                const high = context.chart.data.datasets[1].data[0] + low;
+                                return `范围: ${low} - ${high}万元`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error("渲染模态框薪资图表时出错:", error);
+    }
 }
 
+/**
+ * 关闭模态框
+ */
 function closeModal() {
     modal.classList.add('opacity-0');
     modalContent.classList.add('scale-95');
+    // 动画结束后隐藏模态框并恢复背景滚动
     setTimeout(() => {
         modal.classList.add('hidden');
         document.body.style.overflow = 'auto';
     }, 300);
 }
 
+// 模态框关闭按钮点击事件
 closeModalBtn。addEventListener('click', closeModal);
+// 点击模态框背景关闭模态框
 modal。addEventListener('click', (e) => {
     if (e.target === modal) {
         closeModal();
     }
 });
 
+// 确保DOM内容加载完毕后执行初始化
 document。addEventListener('DOMContentLoaded', initialize);
 </script>
 
