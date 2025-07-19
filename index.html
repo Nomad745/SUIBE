@@ -36,21 +36,21 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        /* Button filter styles */
-        .nav-button, .industry-tag {
+        /* Button filter styles - Unified to btn-filter for consistency with 上外岗位 */
+        .btn-filter { /* Changed from .nav-button, .industry-tag */
             transition: all 0.3s ease;
             border: 1px solid #d1d5db; /* gray-300 */
             background-color: #ffffff;
             color: #4b5563; /* gray-600 */
         }
-        .nav-button.active, .industry-tag.active {
+        .btn-filter.active { /* Changed from .nav-button.active, .industry-tag.active */
             background-color: #1e3a8a; /* blue-800 */
             color: white;
             font-weight: 700;
             border-color: #1e3a8a;
             box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
         }
-        .nav-button:not(.active):hover, .industry-tag:not(.active):hover {
+        .btn-filter:not(.active):hover { /* Changed from .nav-button:not(.active):hover, .industry-tag:not(.active):hover */
             background-color: #f3f4f6; /* gray-100 */
             border-color: #3b82f6; /* blue-500 */
             color: #1e3a8a;
@@ -161,30 +161,30 @@
 
             <section id="college-selector" class="mb-8 text-center">
                 <div class="inline-flex rounded-lg shadow-lg" role="group">
-                    <button type="button" id="btn-finance" class="nav-button active text-lg font-semibold py-3 px-8 rounded-l-lg">
+                    <button type="button" id="btn-finance" class="btn-filter active text-lg font-semibold py-3 px-8 rounded-l-lg">
                         <span class="mr-2">🎓</span>金融管理学院
                     </button>
-                    <button type="button" id="btn-intltrade" class="nav-button text-lg font-semibold py-3 px-8">
+                    <button type="button" id="btn-intltrade" class="btn-filter text-lg font-semibold py-3 px-8">
                         <span class="mr-2">🌍</span>国际经贸学院
                     </button>
-                    <button type="button" id="btn-statistics" class="nav-button text-lg font-semibold py-3 px-8 rounded-r-lg">
+                    <button type="button" id="btn-statistics" class="btn-filter text-lg font-semibold py-3 px-8 rounded-r-lg">
                         <span class="mr-2">📊</span>统计与信息学院
                     </button>
                 </div>
             </section>
 
-            <section id="industry-tags" class="mb-8 text-center space-x-2 space-y-2">
+            <section id="industry-filters" class="mb-8 text-center space-x-2 space-y-2">
                 <!-- Industry tags will be rendered here by JavaScript -->
             </section>
 
-            <section id="job-postings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <section id="job-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             </section>
 
             <section id="salary-visualization" class="my-16 glass-card p-6 rounded-xl">
                  <h3 class="text-2xl font-bold text-center text-primary-accent mb-2">薪酬水平速览</h3>
                  <p class="text-center text-gray-600 mb-6 max-w-3xl mx-auto">本图表直观展示了不同岗位的年薪范围（单位：万元），帮助您快速了解各职业方向的收入潜力。薪酬范围综合了初级到资深级别，具体薪资会因个人能力、经验和所在公司而异。</p>
                 <div class="chart-container">
-                    <canvas id="salaryChart"></canvas>
+                    <canvas id="salaryOverviewChart"></canvas>
                 </div>
             </section>
 
@@ -240,28 +240,15 @@
                         <div>
                             <h3 class="font-bold text-lg mb-3 border-l-4 border-secondary-accent pl-3">典型发展路径</h3>
                             <div id="modal-path" class="flex flex-wrap items-center text-sm"></div>
-                            <!-- New section for AI-generated career path -->
-                            <div class="mt-4">
-                                <button id="generate-career-path-btn" class="bg-blue-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors flex items-center justify-center">
-                                    <span class="mr-2">✨</span>获取AI职业路径建议
-                                </button>
-                                <div id="ai-career-path-loading" class="hidden text-center mt-2 text-gray-600">
-                                    <div class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" role="status">
-                                        <span class="sr-only">Loading...</span>
-                                    </div>
-                                    正在生成中...
-                                </div>
-                                <div id="ai-career-path-result" class="mt-3 text-gray-700 text-sm leading-relaxed space-y-2"></div>
-                            </div>
                         </div>
                     </div>
                     <!-- Right Column -->
                     <div>
                          <div class="mb-6 glass-card p-4 rounded-lg">
-                            <h3 class="font-bold text-lg mb-3 border-l-4 border-secondary-accent pl-3">薪酬水平参考</h3>
+                            <h3 class="font-bold text-lg mb-3 border-l-4 border-secondary-accent pl-3">薪酬水平参考 (年薪)</h3>
                             <p id="modal-salary-text" class="text-sm text-gray-600 mb-4"></p>
                             <div class="chart-container h-48 md:h-56">
-                                <canvas id="modal-salary-chart"></canvas>
+                                <canvas id="salaryChart"></canvas>
                             </div>
                         </div>
                         <div class="glass-card p-4 rounded-lg">
@@ -275,1006 +262,985 @@
     </div>
 
 <script>
-const jobData = {
-    finance: {
-        '商业银行': [
-            {
-                tier: '前台',
-                title: '管理培训生',
-                jd: [
-                    '经历系统性培养和多岗位轮岗，全面熟悉银行业务流程。',
-                    '积累基层与业务条线经验，为未来管理岗位做准备。'
-                ],
-                requirements: [
-                    '国内外重点院校本科及以上学历，专业不限，金融、法律、STEM优先。',
-                    '优秀的学习、沟通能力和团队合作精神。',
-                    '有知名企业实习经历者优先。'
-                ],
-                salary: '12-25万/年',
-                salaryRange: [12, 25],
-                path: ['轮岗学习', '定岗', '业务专家/团队经理', '部门/支行负责人'],
-                companies: '招商银行、汇丰中国、工商银行',
-                cert: 'none'
-            },
-            {
-                tier: '中台',
-                title: '信用分析师',
-                jd: [
-                    '对信贷业务进行深入的风险评估与管理，协调信贷发起部门讨论信贷意见差异。',
-                    '审查业务部门提供的偏离标准政策和指南的理由，提供专业意见和建议。',
-                    '复核信贷发起部门的信用风险评级，并最终确定信用风险评级。'
-                ],
-                requirements: [
-                    '金融或会计学士学位，至少2年商业银行或企业银行的信用风险经验。',
-                    '扎实的金融会计知识，对信贷和贸易金融有广泛了解。',
-                    '出色的英文商务写作能力和良好的人际沟通能力，流利的普通话和英语。',
-                    'CFA和FRM资质具有显著优势。'
-                ],
-                salary: '44.2万-66.3万/年',
-                salaryRange: [44.2, 66.3],
-                path: ['初级分析师', '高级分析师', '信用风险经理', '部门主管'],
-                companies: '中国银行、中诚信国际、中证鹏元',
-                cert: 'cfa, frm'
-            },
-            {
-                tier: '中台',
-                title: '风险管理分析师',
-                jd: [
-                    '识别、评估和缓解信息安全风险，领导和协调风险控制自我评估（RCSA）流程。',
-                    '定期进行风险评估，分析风险数据以评估潜在影响和可能性。',
-                    '制定和实施风险管理和缓解策略与控制措施，利用GRC工具简化风险管理流程。'
-                ],
-                requirements: [
-                    '信息技术、网络安全、风险管理或相关学士学位。',
-                    '对信息安全原则和框架有深刻理解，具备风险评估工具和方法学实践经验。',
-                    '熟练领导和促进RCSA流程，了解相关法规和标准，精通GRC工具和平台。',
-                    '强大的分析和解决问题能力，有效的沟通和演示能力。',
-                    'FRM认证具有极高优先度，CFA资质也有益。'
-                ],
-                // Converted from 55,000-75,000美元/年 to 万元人民币 (approx 1 USD = 7.2 RMB)
-                salary: '39.6万-54万/年 (美元换算)',
-                salaryRange: [39.6, 54],
-                path: ['初级分析师', '高级分析师', '风险总监', '首席风险官'],
-                companies: '对冲基金、资产管理公司、私募股权公司、投资银行、汇丰银行',
-                cert: 'frm, cfa'
-            },
-            {
-                tier: '中台',
-                title: '合规官',
-                jd: [
-                    '确保公司遵守本地和国际法律法规以及公司内部标准。',
-                    '制定和实施内部政策，识别公司内部合规风险领域，定期进行检查。',
-                    '作为第一响应者识别并报告违规或违约行为，对员工进行培训。'
-                ],
-                requirements: [
-                    '法律、金融或工商管理学位，硕士学位更佳。',
-                    'CAMS、CCEP或CFE等认证备受追捧。',
-                    '量化能力、严谨性、人际交往能力。',
-                    '国际经验、双语能力（中英文流利）和跨文化管理能力是重要优势。',
-                    'CFA和FRM资质能增强对金融产品、市场运作和风险的理解。'
-                ],
-                // Converted from 40,000-100,000+美元/年 to 万元人民币 (approx 1 USD = 7.2 RMB)
-                salary: '28.8万-72万/年 (美元换算)',
-                salaryRange: [28.8, 72],
-                path: ['初级合规专员', '高级合规经理', '合规总监', '首席合规官'],
-                companies: '银行和金融机构、科技、医疗、制造和零售电商行业',
-                cert: 'cfa, frm'
-            }
-        ],
-        '券商': [
-            {
-                tier: '前台',
-                title: '投资银行分析师',
-                jd: [
-                    '参与IPO、并购重组、再融资等项目，进行尽职调查、材料撰写。',
-                    '构建财务模型，进行企业估值和行业研究。',
-                    '协助项目执行，与客户、中介机构沟通协调。'
-                ],
-                requirements: [
-                    '金融、财务、法律、工科等相关专业的本科或硕士学位。',
-                    '对投资银行业务有一定了解和兴趣，熟练使用Word、Excel、PPT。',
-                    '具备较强的数理分析和建模能力。',
-                    'CPA、CFA等相关资格优先。'
-                ],
-                salary: '25-60万/年',
-                salaryRange: [25, 60],
-                path: ['分析师(Analyst)', '经理(Associate)', '副总裁(VP)', '董事总经理(MD)'],
-                companies: '中金公司、中信证券、华泰证券',
-                cert: 'cfa'
-            },
-            {
-                tier: '前台',
-                title: '股票研究分析师',
-                jd: [
-                    '对中国公司进行深入的深度基本面研究，涵盖各个行业，生成可操作的投资理念。',
-                    '开发和维护详细的财务模型和投资论点，监控宏观经济、监管和地缘政治发展。',
-                    '与公司管理层、行业专家和卖方分析师沟通，向投资委员会和投资组合经理汇报。'
-                ],
-                salary: '55.1万-156.2万/年',
-                salaryRange: [55.1, 156.2],
-                requirements: [
-                    '金融、经济学、会计或相关领域的学士或更高学位。',
-                    'CFA资质或正在考取CFA是重要加分项。',
-                    '3-7年股票研究、投资银行、资产管理或咨询经验，专注于中国市场。',
-                    '对中国财务报表、监管环境和公司治理有深刻理解。',
-                    '具备构建和维护稳健财务模型以及估值实践能力。',
-                    '优秀的英文和普通话书面及口头沟通能力，强大的分析、批判性思维和解决问题能力。'
-                ],
-                path: ['助理研究员', '行业研究员', '资深研究员', '研究总监/首席策略师'],
-                companies: '摩根士丹利、国泰君安证券',
-                cert: 'cfa'
-            },
-            {
-                tier: '前台',
-                title: '金融市场交易员',
-                jd: [
-                    '执行固定收益类资产交易，完成相关的沟通、询价和反馈工作。',
-                    '挖掘和维护机构类合作客户，汇总和统计交易信息。',
-                    '负责场外期权、互换等衍生品客户的询报价管理，编程开发交易辅助工具。'
-                ],
-                requirements: [
-                    '金融、经济学、会计等相关专业的学士学位。',
-                    '具备扎实的金融学基础专业知识。',
-                    'CFA或FRM资质是重要加分项。'
-                ],
-                salary: '44.2万-71.8万/年',
-                salaryRange: [44.2, 71.8],
-                path: ['交易助理/初级交易员', '资深交易员', '交易主管', '投资组合经理/基金经理'],
-                companies: '摩根士丹利、中国建设银行、中国银行、中信证券、国泰君安期货',
-                cert: 'cfa, frm'
-            },
-            {
-                tier: '中台',
-                title: '量化分析师',
-                jd: [
-                    '利用数学模型、统计技术和编程分析金融数据，开发交易、风险管理或投资策略。',
-                    '初级职位侧重于数据分析和模型实现，高级职位涉及开发复杂模型、领导团队。',
-                    '与高级分析师协作，分析数据，识别趋势，为创建可操作的见解做出贡献。'
-                ],
-                requirements: [
-                    '计算机、软件工程、金融工程、数学、统计、物理等相关专业的本科或硕士学位。',
-                    '精通C++/C#/Python/Go/Java等开发语言中的至少一种，数据库开发经验或量化行业经验优先。',
-                    '优秀的编程能力，有面向对象、泛型和多线程编程经验。',
-                    '良好的自我驱动力和团队合作意识，较强的沟通协调能力。',
-                    'CFA和FRM资质具有高度优先性。'
-                ],
-                salary: '30-100万+/年',
-                salaryRange: [30, 100],
-                path: ['数据分析和模型实现', '开发复杂模型', '领导团队', '推动战略决策'],
-                companies: '摩根士丹利、中金公司、华泰证券、国泰君安期货',
-                cert: 'cfa, frm'
-            }
-        ],
-        '基金': [
-            {
-                tier: '前台',
-                title: '投资经理',
-                jd: [
-                    '管理基金资产，制定并执行投资策略。',
-                    '进行宏观、行业和个股研究，构建和调整投资组合。',
-                    '负责路演、渠道沟通，向投资者阐述投资理念。'
-                ],
-                requirements: [
-                    '硕士及以上学历，经济金融、理工科等复合背景优先。',
-                    '通常由3-5年以上经验的研究员晋升，持有CFA者优先。',
-                    '优秀的投研能力、决策能力和市场敏感度。'
-                ],
-                salary: '50-200万/年',
-                salaryRange: [50, 200],
-                path: ['研究员', '基金经理助理', '基金经理', '投研总监'],
-                companies: '南方基金、华安基金、博道基金',
-                cert: 'cfa'
-            },
-            {
-                tier: '中台',
-                title: '基金研究员',
-                jd: [
-                    '深入研究宏观经济、行业趋势和上市公司。',
-                    '撰写研究报告，为投资决策提供支持和建议。',
-                    '进行上市公司调研，维护行业数据库。'
-                ],
-                requirements: [
-                    '硕士及以上学历，经济金融、理工科等专业，对研究有浓厚兴趣。',
-                    '通过CFA一级或二级者有显著优势。',
-                    '具备扎实的研究分析能力、财务建模能力和报告撰写能力。'
-                ],
-                salary: '20-40万/年',
-                salaryRange: [20, 40],
-                path: ['初级研究员', '高级研究员', '资深研究员', '基金经理/投研总监'],
-                companies: '易方达基金、嘉实基金、景顺长城',
-                cert: 'cfa'
-            },
-            {
-                tier: '前台',
-                title: '财富管理助理/客户经理',
-                jd: [
-                    '协助高级团队成员管理客户关系，积极支持客户开发，关注中国财富管理市场。',
-                    '确保日常销售支持和客户服务任务顺利执行，与内部部门协作推动跨境项目和销售赋能。',
-                    '协助客户经理建立和维护客户关系，了解客户财务目标和需求。',
-                    '准备客户会议材料，分析财务报表和现金流模式识别潜在风险和机会。'
-                ],
-                requirements: [
-                    '3-7年投资管理或另类资产管理相关经验，跨境业务经验优先。',
-                    '对金融市场有深刻理解，能清晰阐述投资理念。',
-                    '熟悉资产管理行业，特别是财富和零售业务领域，具备销售或产品策略经验。',
-                    '了解公募基金、ETF、另类投资和数字化解决方案。',
-                    '优秀的演示和公共演讲能力，流利的英语和普通话，粤语更佳。',
-                    '熟悉银行零售金融业务和产品，具备资本市场分析和资产配置规划能力。',
-                    '熟练掌握各类数据库软件、建模工具、ETL工具和报表工具。',
-                    'CFA资质能提供扎实的金融市场和投资组合管理知识，是重要加分项。'
-                ],
-                salary: '12万-66.3万/年',
-                salaryRange: [12, 66.3],
-                path: ['助理角色', '客户经理', '高级客户经理/团队负责人', '企业银行负责人'],
-                companies: '贝莱德、汇丰银行、中国工商银行、中国银行、兴业银行、友邦国际',
-                cert: 'cfa'
-            },
-            {   // Moved from 商业银行
-                tier: '后台',
-                title: '基金运营专员',
-                jd: [
-                    '负责基金产品的净值核算与披露，以及交易结算处理与跟踪。',
-                    '撰写系统开发需求并进行测试，参与基金账户管理和运营相关标准化手册设计。',
-                    '负责日常清算资金交收和账务处理，参与资金系统和销售系统参数维护及业务测试。'
-                ],
-                requirements: [
-                    '本科及以上学历，会计、金融、财务、经济相关专业背景。',
-                    '扎实的财会专业知识基础，了解基金相关法律法规，良好的风险防范意识和保密意识。',
-                    '工作细致认真严谨，责任心强，具备团队精神，精通Office等办公及统计软件。',
-                    '编程技术背景或会计/基金从业资格者优先。',
-                    'CFA Level 1/2或FRM Level 1/2的知识背景有助于理解基金产品的复杂性。'
-                ],
-                salary: '12万-18万/年', // Converted from monthly to annual
-                salaryRange: [12, 18],
-                path: ['基层运营', '高级运营专员', '运营主管', '运营经理/部门负责人'],
-                companies: '易方达基金、博时基金、广发基金、南方基金',
-                cert: 'cfa, frm'
-            }
-        ],
-        '互联网金融': [
-            {
-                tier: '中台',
-                title: '金融科技产品经理',
-                jd: [
-                    '负责金融产品的需求分析、功能设计和生命周期管理。',
-                    '协调研发、设计、运营团队，推动产品上线和迭代。',
-                    '研究市场和用户，结合业务目标进行产品创新。'
-                ],
-                requirements: [
-                    '本科及以上学历，计算机、金融等复合背景优先。',
-                    '熟悉互联网产品开发流程，具备用户思维和商业敏感度。',
-                    '优秀的沟通协调能力和项目管理能力。'
-                ],
-                salary: '25-70万/年',
-                salaryRange: [25, 70],
-                path: ['产品专员', '产品经理', '高级产品经理', '产品总监'],
-                companies: '蚂蚁集团、腾讯金融、微众银行',
-                cert: 'none'
-            }
-        ],
-        '四大咨询': [
-            {
-                tier: '中台',
-                title: '金融服务/风险咨询师',
-                jd: [
-                    '为银行、保险、券商等金融机构提供战略、运营、风控等咨询服务。',
-                    '参与项目，进行行业研究、数据分析、方案设计和报告撰写。',
-                    '协助客户应对监管要求，实施数字化转型。'
-                ],
-                requirements: [
-                    '硕士及以上学历优先，专业不限，商科、理工科背景均可。',
-                    '持有CFA、FRM、CPA等证书者优先。',
-                    '顶尖的逻辑分析、解决问题和沟通表达能力。'
-                ],
-                salary: '15-40万/年',
-                salaryRange: [15, 40],
-                path: ['分析师', '咨询顾问', '高级顾问', '项目经理/合伙人'],
-                companies: '普华永道、德勤、安永、毕马威',
-                cert: 'cfa, frm'
-            }
-        ],
-        'ESG': [
-            {
-                tier: '中台',
-                title: 'ESG分析师',
-                jd: [
-                    '研究环境、社会和治理因素如何影响投资回报和风险。',
-                    '筛选数据发现ESG策略趋势和见解，调查公司ESG信誉和规则遵守情况。',
-                    '与投资专业人士合作，将ESG因素融入财务分析，并与公司沟通ESG表现。'
-                ],
-                requirements: [
-                    '金融、可持续发展、环境科学或类似领域的学位或文凭。',
-                    '具备ESG研究专业知识，包括数据处理、可持续发展报告和财务分析。',
-                    'SASB和GRI等认证能提升专业信誉。',
-                    '数据分析和研究能力、商业知识、沟通能力、监管理解和技术技能。',
-                    'CFA资质具有显著优势。'
-                ],
-                salary: '20万-100万+/年',
-                salaryRange: [20, 100],
-                path: ['助理分析师', 'ESG分析师', '高级分析师', 'ESG研究/投资总监'],
-                companies: '私募股权公司、资产管理公司、银行、咨询公司、财富管理公司、鼎力公司、基金公司',
-                cert: 'cfa'
-            },
-            {
-                tier: '中台',
-                title: '可持续金融专员',
-                jd: [
-                    '专注于将环境、社会和治理（ESG）标准融入金融服务。',
-                    '评估可持续性风险和机会，确保投资符合可持续发展目标。',
-                    '指导金融公司将可持续金融原则整合到其运营和投资策略中。'
-                ],
-                requirements: [
-                    '金融、经济学、可持续发展或相关领域的学士学位，硕士学位更佳。',
-                    '具备可持续金融或ESG分析认证是加分项。',
-                    '3-5年可持续金融、ESG分析或影响力投资经验。',
-                    '对金融市场、投资策略和风险管理有深刻理解，熟练掌握可持续发展报告框架。',
-                    '了解与可持续金融实践相关的监管要求和行业标准。',
-                    'CFA资质具有显著优势。'
-                ],
-                // Converted from 65.2万/年 (美国估计) to 万元人民币 (approx 1 USD = 7.2 RMB for the original 65.2k USD)
-                // Assuming the original 65.2万/年 was actually 65.2k USD. Re-evaluating the original data:
-                // "65.2万/年 (美国估计)" -> This implies 65.2 * 10,000 RMB. So it's already in 10k RMB.
-                // The original salaryRange: [65.2, 90] seems to imply 65.2万 to 90万 RMB.
-                // I will keep the original interpretation as it seems consistent with '万/年'.
-                salary: '65.2万-90万/年 (美国估计)',
-                salaryRange: [65.2, 90],
-                path: ['支持ESG数据分析和报告撰写', '可持续金融产品开发', '战略制定和利益相关者沟通'],
-                companies: '鼎力公司、MultiplyMii、资产管理公司、银行、咨询公司',
-                cert: 'cfa'
-            }
-        ]
-    },
-    intltrade: {
-        '国际贸易公司': [
-            {
-                tier: '前台',
-                title: '国际贸易专员',
-                jd: [
-                    '负责公司产品在国际市场的销售和推广，完成部门销售指标。',
-                    '全面分析全球市场需求，建立和优化公司贸易业务的操作流程及管理制度。',
-                    '管理和维护客户关系以及客户间的长期战略合作计划。',
-                    '贸易合同的草拟、沟通、传递和归档管理，准备、传递和管理物流、报关、结算单据。'
-                ],
-                requirements: [
-                    '国际贸易或外语相关专业的学士学位。',
-                    '流利的英语和普通话沟通能力，若掌握其他小语种更佳。',
-                    '良好的沟通、谈判、抗压和团队协作能力，敏捷的思维和学习能力。'
-                ],
-                salary: '7万-69.3万/年',
-                salaryRange: [7, 69.3],
-                path: ['执行岗位', '部门主管/高级管理岗位', '高级交易员/管理岗位', '期货交易员/期货交易管理岗位'],
-                companies: '天津世纪五矿贸易有限公司、中粮集团、中国中化',
-                cert: 'none'
-            },
-            {
-                tier: '中台',
-                title: '贸易金融专员',
-                jd: [
-                    '处理贸易融资相关的业务，包括信用证、托收、保函等。',
-                    '协助客户完成贸易融资申请，审核相关单据，确保交易合规。',
-                    '与银行、企业等各方进行沟通协调，促进贸易交易的顺利完成。'
-                ],
-                requirements: [
-                    '金融、国际贸易或相关专业的学士学位。',
-                    '具备贸易金融产品知识和操作经验，熟悉国际贸易惯例和相关法规。',
-                    '良好的沟通协调能力、风险意识和解决问题能力。'
-                ],
-                // Converted from 66.7万/年 (美国估计) to 万元人民币 (approx 1 USD = 7.2 RMB for original 66.7k USD)
-                // Similar to ESG Sustainable Finance Specialist, assuming 66.7万 implies 66.7 * 10,000 RMB.
-                salary: '66.7万-90万/年 (美国估计)',
-                salaryRange: [66.7, 90],
-                path: ['初级岗位', '高级专员', '贸易金融经理', '部门负责人'],
-                companies: '商业银行（如中国银行、汇丰银行）、大型贸易公司、供应链金融公司',
-                cert: 'none'
-            },
-            {
-                tier: '后台',
-                title: '供应链分析师',
-                jd: [
-                    '规划、分析和监控公司的供应链分销，确保产品及时、高效地到达目的地。',
-                    '参与具体项目，如在新国家推出产品或通过识别新路线或供应商降低成本。',
-                    '公司与其（通常是海外）供应商之间的联络人，负责研究合理价格和谈判优惠交易。',
-                    '监控仓库库存并使用SAP等工具跟踪所需产品数量。'
-                ],
-                requirements: [
-                    '供应链管理、运营管理或相关领域的学位。',
-                    '具备数据分析、批判性思维和解决问题能力。',
-                    '有效的沟通能力、人际交往能力和组织能力。'
-                ],
-                salary: '4.5万-9.6万/年',
-                salaryRange: [4.5, 9.6],
-                path: ['初级分析师', '高级分析师', '供应链经理', '供应链总监'],
-                companies: '京东物流、菜鸟网络、中远海运、顺丰速运、华为、宝洁',
-                cert: 'none'
-            }
-        ],
-        '跨境电商': [
-            {
-                tier: '前台',
-                title: '跨境电商运营专员',
-                jd: [
-                    '负责跨境电商网站内容的编辑、优化和更新，确保内容准确并符合目标市场需求。',
-                    '撰写和优化产品描述、营销文案和SEO内容，使用PS/Canva等工具进行基础图像编辑。',
-                    '规划和实施基于市场趋势和用户反馈的内容优化策略，与设计和运营团队协作。',
-                    '监控内容表现，分析数据，提出改进建议。',
-                    '学习跨境电商平台各项政策与制度，控制产品风险，保持账号健康稳定。',
-                    '协助主管制定销售计划，处理货品打包和发货相关事宜。'
-                ],
-                requirements: [
-                    '学士或更高学位，英语、阿拉伯语、市场营销或相关专业优先。',
-                    '精通英语和阿拉伯语，具备优秀的书面沟通能力。',
-                    '具备基础平面设计技能，有跨境电商或网站编辑经验者优先。',
-                    '熟悉SEO优化技术和搜索引擎排名规则，强大的学习能力、团队精神和对跨境电商行业的热情。'
-                ],
-                salary: '6万-18万/年', // Converted from monthly to annual
-                salaryRange: [6, 18],
-                path: ['基层运营', '高级运营专员', '运营主管', '运营经理/部门负责人'],
-                companies: '京东国际、阿里巴巴国际站、拼多多、常熟伊斯格进出口有限公司、北京亿昌传媒科技有限公司',
-                cert: 'none'
-            }
-        ]
-    },
-    statistics: {
-        '券商': [
-            {
-                tier: '中台',
-                title: '量化研究员',
-                jd: [
-                    '利用数理统计方法和编程技术，挖掘市场规律，开发量化交易策略。',
-                    '负责策略的回测、优化和实盘跟踪。',
-                    '处理和分析海量金融数据，维护量化投研平台。'
-                ],
-                requirements: [
-                    '硕士及以上学历，数学、统计、物理、计算机等顶尖理工科专业。',
-                    '精通Python/C++，具备扎实的算法和数据结构基础。',
-                    '有量化实习或竞赛获奖经历者优先，通过CFA/FRM者优先。'
-                ],
-                salary: '30-100万+/年',
-                salaryRange: [30, 100],
-                path: ['初级量化研究员', '量化研究员', '资深研究员', '量化投资经理'],
-                companies: '中信证券、华泰证券、幻方量化',
-                cert: 'cfa, frm'
-            },
-            {
-                tier: '中后台',
-                title: '风险管理岗（量化方向）',
-                jd: [
-                    '负责量化策略的风险建模、压力测试和绩效归因。',
-                    '监控交易系统和投资组合的风险暴露，设置风控参数。',
-                    '开发和维护风险管理系统和工具。'
-                ],
-                requirements: [
-                    '硕士及以上学历，金融工程、统计学、计算机等专业。',
-                    '精通FRM知识体系，熟悉风险计量方法（如VaR）。',
-                    '具备编程能力（Python/R），能处理和分析数据。'
-                ],
-                salary: '25-60万/年',
-                salaryRange: [25, 60],
-                path: ['风控专员', '量化风控经理', '高级经理', '风控总监'],
-                companies: '国泰君安、海通证券、头部私募',
-                cert: 'frm'
-            }
-        ],
-        '基金': [
-             {
-                tier: '中台',
-                title: '量化研究员',
-                jd: [
-                    '挖掘阿尔法/贝塔因子，开发股票、期货、期权等多品种量化策略。',
-                    '协助数据清洗、整理、可视化以及数据库维护。',
-                    '开发及维护量化策略绩效归因系统。'
-                ],
-                requirements: [
-                    '顶尖院校硕士及以上学历，数学、统计、计算机等理工科专业。',
-                    '优秀的编程能力（Python/C++）和数据处理能力。',
-                    '在ACM、Kaggle、数学建模等竞赛中获奖者优先。'
-                ],
-                salary: '30-100万+/年',
-                salaryRange: [30, 100],
-                path: ['初级量化研究员', '量化研究员', '资深研究员', '量化投资经理'],
-                companies: '博时基金、华夏基金、进化论资产',
-                cert: 'cfa, frm'
-            },
-            {
-                tier: '中后台',
-                title: '风险监督员（量化）',
-                jd: [
-                    '隶属公司核心风控体系，对量化交易业务进行全周期实时监控。',
-                    '核实基金仓位、持仓结构，及时识别并处置异常交易和风险事件。',
-                ],
-                requirements: [
-                    '硕士及以上学历，数学、统计、计算机等专业。',
-                    '具备编程能力，对金融市场和量化交易有一定理解。',
-                    'FRM持证人或考生优先，要求高度的责任心和细致。'
-                ],
-                salary: '15-30万/年',
-                salaryRange: [15, 30],
-                path: ['风险监督员', '风控分析员', '策略审核岗', '运营管理'],
-                companies: '博时基金、大型公募基金',
-                cert: 'frm'
-            }
-        ],
-        '商业银行': [
-            {
-                tier: '中后台',
-                title: '数据分析师/数字金融岗',
-                jd: [
-                    '利用统计建模、数据挖掘等技术，分析客户行为、信贷风险、营销效果等。',
-                    '搭建业务数据报表体系，为决策提供数据支持。',
-                    '参与数字化产品的设计、营销和运营。'
-                ],
-                requirements: [
-                    '本科及以上学历，统计、计算机、数学等专业。',
-                    '熟练使用SQL、Python/R等数据分析工具。',
-                    '具备数据敏感度和业务理解能力，善于从数据中发现问题。'
-                ],
-                salary: '15-40万/年',
-                salaryRange: [15, 40],
-                path: ['数据分析师', '高级数据分析师', '数据科学家', '数据部门负责人'],
-                companies: '招商银行、平安银行、浦发银行',
-                cert: 'cfa, frm'
-            }
-        ],
-        '互联网金融': [
-            {
-                tier: '中台',
-                title: '数据科学家/风控建模师',
-                jd: [
-                    '利用机器学习、深度学习等算法构建信用评分、反欺诈、营销响应等模型。',
-                    '负责模型的开发、部署、监控和迭代优化。' ,
-                    '深入分析海量数据，洞察业务机会和风险点。'
-                ],
-                requirements: [
-                    '硕士及以上学历，统计、计算机、人工智能等顶尖专业。',
-                    '扎实的机器学习理论基础和丰富的项目经验。',
-                    '优秀的编程能力和大数据处理能力（如Spark/Hadoop）。'
-                ],
-                salary: '35-80万+/年',
-                salaryRange: [35, 80],
-                path: ['算法工程师', '数据科学家', '资深数据科学家', '首席科学家'],
-                companies: '蚂蚁集团、微众银行、京东科技',
-                cert: 'cfa, frm'
-            }
-        ],
-        '四大咨询': [
-            {
-                tier: '中台',
-                title: '数据与分析咨询顾问',
-                jd: [
-                    '为金融客户提供数据战略、数据治理、数据分析应用等咨询服务。',
-                    '利用数据分析和可视化工具，帮助客户解决商业问题。',
-                    '参与金融机构数字化转型项目，设计和实施数据驱动的解决方案。'
-                ],
-                requirements: [
-                    '硕士及以上学历，统计、计算机、数学、商科等复合背景。',
-                    '熟练使用SQL、Python/R、Tableau等分析工具。',
-                    '优秀的商业理解能力、逻辑思维和沟通表达能力。'
-                ],
-                salary: '18-45万/年',
-                salaryRange: [18, 45],
-                path: ['分析师', '咨询顾问', '高级顾问', '项目经理/合伙人'],
-                companies: '普华永道、德勤、安永、毕马威',
-                cert: 'cfa, frm'
-            }
-        ]
-    }
-};
-
-const collegeSelector = document.getElementById('college-selector');
-const industryTagsContainer = document.getElementById('industry-tags');
-const jobPostingsContainer = document.getElementById('job-postings');
-let salaryChartInstance = null; // Renamed for clarity and consistency
-
-// Initialize currentCollege and currentIndustry at the top level
-let currentCollege = 'finance';
-let currentIndustry = 'all'; // Default to 'all' industries
-
-
-function renderIndustryTags() {
-    const industries = Object.keys(jobData[currentCollege]);
-    industryTagsContainer.innerHTML = `<button class="industry-tag inline-block font-medium py-2 px-4 rounded-full shadow-sm hover:bg-blue-100 transition duration-300" data-industry="all">所有行业</button>` + industries.map(industry => `
-        <button class="industry-tag inline-block font-medium py-2 px-4 rounded-full shadow-sm hover:bg-blue-100 transition duration-300" data-industry="${industry}">
-            ${industry}
-        </button>
-    `).join('');
-    
-    industryTagsContainer.querySelectorAll('.industry-tag').forEach(tag => {
-        tag.addEventListener('click', () => {
-            currentIndustry = tag.dataset.industry;
-            updateActiveStates();
-            renderJobPostings();
-            renderSalaryChart(); // Re-render overview chart on filter change
-        });
-    });
-}
-
-function renderJobPostings() {
-    let postings = [];
-    if (currentIndustry === 'all') {
-        for (const industry in jobData[currentCollege]) {
-            postings = postings.concat(jobData[currentCollege][industry]);
+    // 岗位数据，保持与原外贸岗位文件一致
+    const jobData = {
+        finance: {
+            '商业银行': [
+                {
+                    tier: '前台',
+                    title: '管理培训生',
+                    jd: [
+                        '经历系统性培养和多岗位轮岗，全面熟悉银行业务流程。',
+                        '积累基层与业务条线经验，为未来管理岗位做准备。'
+                    ],
+                    requirements: [
+                        '国内外重点院校本科及以上学历，专业不限，金融、法律、STEM优先。',
+                        '优秀的学习、沟通能力和团队合作精神。',
+                        '有知名企业实习经历者优先。'
+                    ],
+                    salary: '12-25万/年',
+                    salaryRange: [12, 25],
+                    path: ['轮岗学习', '定岗', '业务专家/团队经理', '部门/支行负责人'],
+                    companies: '招商银行、汇丰中国、工商银行',
+                    cert: 'none'
+                },
+                {
+                    tier: '中台',
+                    title: '信用分析师',
+                    jd: [
+                        '对信贷业务进行深入的风险评估与管理，协调信贷发起部门讨论信贷意见差异。',
+                        '审查业务部门提供的偏离标准政策和指南的理由，提供专业意见和建议。',
+                        '复核信贷发起部门的信用风险评级，并最终确定信用风险评级。'
+                    ],
+                    requirements: [
+                        '金融或会计学士学位，至少2年商业银行或企业银行的信用风险经验。',
+                        '扎实的金融会计知识，对信贷和贸易金融有广泛了解。',
+                        '出色的英文商务写作能力和良好的人际沟通能力，流利的普通话和英语。',
+                        'CFA和FRM资质具有显著优势。'
+                    ],
+                    salary: '44.2万-66.3万/年',
+                    salaryRange: [44.2, 66.3],
+                    path: ['初级分析师', '高级分析师', '信用风险经理', '部门主管'],
+                    companies: '中国银行、中诚信国际、中证鹏元',
+                    cert: 'cfa, frm'
+                },
+                {
+                    tier: '中台',
+                    title: '风险管理分析师',
+                    jd: [
+                        '识别、评估和缓解信息安全风险，领导和协调风险控制自我评估（RCSA）流程。',
+                        '定期进行风险评估，分析风险数据以评估潜在影响和可能性。',
+                        '制定和实施风险管理和缓解策略与控制措施，利用GRC工具简化风险管理流程。'
+                    ],
+                    requirements: [
+                        '信息技术、网络安全、风险管理或相关学士学位。',
+                        '对信息安全原则和框架有深刻理解，具备风险评估工具和方法学实践经验。',
+                        '熟练领导和促进RCSA流程，了解相关法规和标准，精通GRC工具和平台。',
+                        '强大的分析和解决问题能力，有效的沟通和演示能力。',
+                        'FRM认证具有极高优先度，CFA资质也有益。'
+                    ],
+                    salary: '39.6万-54万/年 (美元换算)',
+                    salaryRange: [39.6, 54],
+                    path: ['初级分析师', '高级分析师', '风险总监', '首席风险官'],
+                    companies: '对冲基金、资产管理公司、私募股权公司、投资银行、汇丰银行',
+                    cert: 'frm, cfa'
+                },
+                {
+                    tier: '中台',
+                    title: '合规官',
+                    jd: [
+                        '确保公司遵守本地和国际法律法规以及公司内部标准。',
+                        '制定和实施内部政策，识别公司内部合规风险领域，定期进行检查。',
+                        '作为第一响应者识别并报告违规或违约行为，对员工进行培训。'
+                    ],
+                    requirements: [
+                        '法律、金融或工商管理学位，硕士学位更佳。',
+                        'CAMS、CCEP或CFE等认证备受追捧。',
+                        '量化能力、严谨性、人际交往能力。',
+                        '国际经验、双语能力（中英文流利）和跨文化管理能力是重要优势。',
+                        'CFA和FRM资质能增强对金融产品、市场运作和风险的理解。'
+                    ],
+                    salary: '28.8万-72万/年 (美元换算)',
+                    salaryRange: [28.8, 72],
+                    path: ['初级合规专员', '高级合规经理', '合规总监', '首席合规官'],
+                    companies: '银行和金融机构、科技、医疗、制造和零售电商行业',
+                    cert: 'cfa, frm'
+                }
+            ],
+            '券商': [
+                {
+                    tier: '前台',
+                    title: '投资银行分析师',
+                    jd: [
+                        '参与IPO、并购重组、再融资等项目，进行尽职调查、材料撰写。',
+                        '构建财务模型，进行企业估值和行业研究。',
+                        '协助项目执行，与客户、中介机构沟通协调。'
+                    ],
+                    requirements: [
+                        '金融、财务、法律、工科等相关专业的本科或硕士学位。',
+                        '对投资银行业务有一定了解和兴趣，熟练使用Word、Excel、PPT。',
+                        '具备较强的数理分析和建模能力。',
+                        'CPA、CFA等相关资格优先。'
+                    ],
+                    salary: '25-60万/年',
+                    salaryRange: [25, 60],
+                    path: ['分析师(Analyst)', '经理(Associate)', '副总裁(VP)', '董事总经理(MD)'],
+                    companies: '中金公司、中信证券、华泰证券',
+                    cert: 'cfa'
+                },
+                {
+                    tier: '前台',
+                    title: '股票研究分析师',
+                    jd: [
+                        '对中国公司进行深入的深度基本面研究，涵盖各个行业，生成可操作的投资理念。',
+                        '开发和维护详细的财务模型和投资论点，监控宏观经济、监管和地缘政治发展。',
+                        '与公司管理层、行业专家和卖方分析师沟通，向投资委员会和投资组合经理汇报。'
+                    ],
+                    salary: '55.1万-156.2万/年',
+                    salaryRange: [55.1, 156.2],
+                    requirements: [
+                        '金融、经济学、会计或相关领域的学士或更高学位。',
+                        'CFA资质或正在考取CFA是重要加分项。',
+                        '3-7年股票研究、投资银行、资产管理或咨询经验，专注于中国市场。',
+                        '对中国财务报表、监管环境和公司治理有深刻理解。',
+                        '具备构建和维护稳健财务模型以及估值实践能力。',
+                        '优秀的英文和普通话书面及口头沟通能力，强大的分析、批判性思维和解决问题能力。'
+                    ],
+                    path: ['助理研究员', '行业研究员', '资深研究员', '研究总监/首席策略师'],
+                    companies: '摩根士丹利、国泰君安证券',
+                    cert: 'cfa'
+                },
+                {
+                    tier: '前台',
+                    title: '金融市场交易员',
+                    jd: [
+                        '执行固定收益类资产交易，完成相关的沟通、询价和反馈工作。',
+                        '挖掘和维护机构类合作客户，汇总和统计交易信息。',
+                        '负责场外期权、互换等衍生品客户的询报价管理，编程开发交易辅助工具。'
+                    ],
+                    requirements: [
+                        '金融、经济学、会计等相关专业的学士学位。',
+                        '具备扎实的金融学基础专业知识。',
+                        'CFA或FRM资质是重要加分项。'
+                    ],
+                    salary: '44.2万-71.8万/年',
+                    salaryRange: [44.2, 71.8],
+                    path: ['交易助理/初级交易员', '资深交易员', '交易主管', '投资组合经理/基金经理'],
+                    companies: '摩根士丹利、中国建设银行、中国银行、中信证券、国泰君安期货',
+                    cert: 'cfa, frm'
+                },
+                {
+                    tier: '中台',
+                    title: '量化分析师',
+                    jd: [
+                        '利用数学模型、统计技术和编程分析金融数据，开发交易、风险管理或投资策略。',
+                        '初级职位侧重于数据分析和模型实现，高级职位涉及开发复杂模型、领导团队。',
+                        '与高级分析师协作，分析数据，识别趋势，为创建可操作的见解做出贡献。'
+                    ],
+                    requirements: [
+                        '计算机、软件工程、金融工程、数学、统计、物理等相关专业的本科或硕士学位。',
+                        '精通C++/C#/Python/Go/Java等开发语言中的至少一种，数据库开发经验或量化行业经验优先。',
+                        '优秀的编程能力，有面向对象、泛型和多线程编程经验。',
+                        '良好的自我驱动力和团队合作意识，较强的沟通协调能力。',
+                        'CFA和FRM资质具有高度优先性。'
+                    ],
+                    salary: '30-100万+/年',
+                    salaryRange: [30, 100],
+                    path: ['数据分析和模型实现', '开发复杂模型', '领导团队', '推动战略决策'],
+                    companies: '摩根士丹利、中金公司、华泰证券、国泰君安期货',
+                    cert: 'cfa, frm'
+                }
+            ],
+            '基金': [
+                {
+                    tier: '前台',
+                    title: '投资经理',
+                    jd: [
+                        '管理基金资产，制定并执行投资策略。',
+                        '进行宏观、行业和个股研究，构建和调整投资组合。',
+                        '负责路演、渠道沟通，向投资者阐述投资理念。'
+                    ],
+                    requirements: [
+                        '硕士及以上学历，经济金融、理工科等复合背景优先。',
+                        '通常由3-5年以上经验的研究员晋升，持有CFA者优先。',
+                        '优秀的投研能力、决策能力和市场敏感度。'
+                    ],
+                    salary: '50-200万/年',
+                    salaryRange: [50, 200],
+                    path: ['研究员', '基金经理助理', '基金经理', '投研总监'],
+                    companies: '南方基金、华安基金、博道基金',
+                    cert: 'cfa'
+                },
+                {
+                    tier: '中台',
+                    title: '基金研究员',
+                    jd: [
+                        '深入研究宏观经济、行业趋势和上市公司。',
+                        '撰写研究报告，为投资决策提供支持和建议。',
+                        '进行上市公司调研，维护行业数据库。'
+                    ],
+                    requirements: [
+                        '硕士及以上学历，经济金融、理工科等专业，对研究有浓厚兴趣。',
+                        '通过CFA一级或二级者有显著优势。',
+                        '具备扎实的研究分析能力、财务建模能力和报告撰写能力。'
+                    ],
+                    salary: '20-40万/年',
+                    salaryRange: [20, 40],
+                    path: ['初级研究员', '高级研究员', '资深研究员', '基金经理/投研总监'],
+                    companies: '易方达基金、嘉实基金、景顺长城',
+                    cert: 'cfa'
+                },
+                {
+                    tier: '前台',
+                    title: '财富管理助理/客户经理',
+                    jd: [
+                        '协助高级团队成员管理客户关系，积极支持客户开发，关注中国财富管理市场。',
+                        '确保日常销售支持和客户服务任务顺利执行，与内部部门协作推动跨境项目和销售赋能。',
+                        '协助客户经理建立和维护客户关系，了解客户财务目标和需求。',
+                        '准备客户会议材料，分析财务报表和现金流模式识别潜在风险和机会。'
+                    ],
+                    requirements: [
+                        '3-7年投资管理或另类资产管理相关经验，跨境业务经验优先。',
+                        '对金融市场有深刻理解，能清晰阐述投资理念。',
+                        '熟悉资产管理行业，特别是财富和零售业务领域，具备销售或产品策略经验。',
+                        '了解公募基金、ETF、另类投资和数字化解决方案。',
+                        '优秀的演示和公共演讲能力，流利的英语和普通话，粤语更佳。',
+                        '熟悉银行零售金融业务和产品，具备资本市场分析和资产配置规划能力。',
+                        '熟练掌握各类数据库软件、建模工具、ETL工具和报表工具。',
+                        'CFA资质能提供扎实的金融市场和投资组合管理知识，是重要加分项。'
+                    ],
+                    salary: '12万-66.3万/年',
+                    salaryRange: [12, 66.3],
+                    path: ['助理角色', '客户经理', '高级客户经理/团队负责人', '企业银行负责人'],
+                    companies: '贝莱德、汇丰银行、中国工商银行、中国银行、兴业银行、友邦国际',
+                    cert: 'cfa'
+                },
+                {
+                    tier: '后台',
+                    title: '基金运营专员',
+                    jd: [
+                        '负责基金产品的净值核算与披露，以及交易结算处理与跟踪。',
+                        '撰写系统开发需求并进行测试，参与基金账户管理和运营相关标准化手册设计。',
+                        '负责日常清算资金交收和账务处理，参与资金系统和销售系统参数维护及业务测试。'
+                    ],
+                    requirements: [
+                        '本科及以上学历，会计、金融、财务、经济相关专业背景。',
+                        '扎实的财会专业知识基础，了解基金相关法律法规，良好的风险防范意识和保密意识。',
+                        '工作细致认真严谨，责任心强，具备团队精神，精通Office等办公及统计软件。',
+                        '编程技术背景或会计/基金从业资格者优先。',
+                        'CFA Level 1/2或FRM Level 1/2的知识背景有助于理解基金产品的复杂性。'
+                    ],
+                    salary: '12万-18万/年',
+                    salaryRange: [12, 18],
+                    path: ['基层运营', '高级运营专员', '运营主管', '运营经理/部门负责人'],
+                    companies: '易方达基金、博时基金、广发基金、南方基金',
+                    cert: 'cfa, frm'
+                }
+            ],
+            '互联网金融': [
+                {
+                    tier: '中台',
+                    title: '金融科技产品经理',
+                    jd: [
+                        '负责金融产品的需求分析、功能设计和生命周期管理。',
+                        '协调研发、设计、运营团队，推动产品上线和迭代。',
+                        '研究市场和用户，结合业务目标进行产品创新。'
+                    ],
+                    requirements: [
+                        '本科及以上学历，计算机、金融等复合背景优先。',
+                        '熟悉互联网产品开发流程，具备用户思维和商业敏感度。',
+                        '优秀的沟通协调能力和项目管理能力。'
+                    ],
+                    salary: '25-70万/年',
+                    salaryRange: [25, 70],
+                    path: ['产品专员', '产品经理', '高级产品经理', '产品总监'],
+                    companies: '蚂蚁集团、腾讯金融、微众银行',
+                    cert: 'none'
+                }
+            ],
+            '四大咨询': [
+                {
+                    tier: '中台',
+                    title: '金融服务/风险咨询师',
+                    jd: [
+                        '为银行、保险、券商等金融机构提供战略、运营、风控等咨询服务。',
+                        '参与项目，进行行业研究、数据分析、方案设计和报告撰写。',
+                        '协助客户应对监管要求，实施数字化转型。'
+                    ],
+                    requirements: [
+                        '硕士及以上学历优先，专业不限，商科、理工科背景均可。',
+                        '持有CFA、FRM、CPA等证书者优先。',
+                        '顶尖的逻辑分析、解决问题和沟通表达能力。'
+                    ],
+                    salary: '15-40万/年',
+                    salaryRange: [15, 40],
+                    path: ['分析师', '咨询顾问', '高级顾问', '项目经理/合伙人'],
+                    companies: '普华永道、德勤、安永、毕马威',
+                    cert: 'cfa, frm'
+                }
+            ],
+            'ESG': [
+                {
+                    tier: '中台',
+                    title: 'ESG分析师',
+                    jd: [
+                        '研究环境、社会和治理因素如何影响投资回报和风险。',
+                        '筛选数据发现ESG策略趋势和见解，调查公司ESG信誉和规则遵守情况。',
+                        '与投资专业人士合作，将ESG因素融入财务分析，并与公司沟通ESG表现。'
+                    ],
+                    requirements: [
+                        '金融、可持续发展、环境科学或类似领域的学位或文凭。',
+                        '具备ESG研究专业知识，包括数据处理、可持续发展报告和财务分析。',
+                        'SASB和GRI等认证能提升专业信誉。',
+                        '数据分析和研究能力、商业知识、沟通能力、监管理解和技术技能。',
+                        'CFA资质具有显著优势。'
+                    ],
+                    salary: '20万-100万+/年',
+                    salaryRange: [20, 100],
+                    path: ['助理分析师', 'ESG分析师', '高级分析师', 'ESG研究/投资总监'],
+                    companies: '私募股权公司、资产管理公司、银行、咨询公司、财富管理公司、鼎力公司、基金公司',
+                    cert: 'cfa'
+                },
+                {
+                    tier: '中台',
+                    title: '可持续金融专员',
+                    jd: [
+                        '专注于将环境、社会和治理（ESG）标准融入金融服务。',
+                        '评估可持续性风险和机会，确保投资符合可持续发展目标。',
+                        '指导金融公司将可持续金融原则整合到其运营和投资策略中。'
+                    ],
+                    requirements: [
+                        '金融、经济学、可持续发展或相关领域的学士学位，硕士学位更佳。',
+                        '具备可持续金融或ESG分析认证是加分项。',
+                        '3-5年可持续金融、ESG分析或影响力投资经验。',
+                        '对金融市场、投资策略和风险管理有深刻理解，熟练掌握可持续发展报告框架。',
+                        '了解与可持续金融实践相关的监管要求和行业标准。',
+                        'CFA资质具有显著优势。'
+                    ],
+                    salary: '65.2万-90万/年 (美国估计)',
+                    salaryRange: [65.2, 90],
+                    path: ['支持ESG数据分析和报告撰写', '可持续金融产品开发', '战略制定和利益相关者沟通'],
+                    companies: '鼎力公司、MultiplyMii、资产管理公司、银行、咨询公司',
+                    cert: 'cfa'
+                }
+            ]
+        },
+        intltrade: {
+            '国际贸易公司': [
+                {
+                    tier: '前台',
+                    title: '国际贸易专员',
+                    jd: [
+                        '负责公司产品在国际市场的销售和推广，完成部门销售指标。',
+                        '全面分析全球市场需求，建立和优化公司贸易业务的操作流程及管理制度。',
+                        '管理和维护客户关系以及客户间的长期战略合作计划。',
+                        '贸易合同的草拟、沟通、传递和归档管理，准备、传递和管理物流、报关、结算单据。'
+                    ],
+                    requirements: [
+                        '国际贸易或外语相关专业的学士学位。',
+                        '流利的英语和普通话沟通能力，若掌握其他小语种更佳。',
+                        '良好的沟通、谈判、抗压和团队协作能力，敏捷的思维和学习能力。'
+                    ],
+                    salary: '7万-69.3万/年',
+                    salaryRange: [7, 69.3],
+                    path: ['执行岗位', '部门主管/高级管理岗位', '高级交易员/管理岗位', '期货交易员/期货交易管理岗位'],
+                    companies: '天津世纪五矿贸易有限公司、中粮集团、中国中化',
+                    cert: 'none'
+                },
+                {
+                    tier: '中台',
+                    title: '贸易金融专员',
+                    jd: [
+                        '处理贸易融资相关的业务，包括信用证、托收、保函等。',
+                        '协助客户完成贸易融资申请，审核相关单据，确保交易合规。',
+                        '与银行、企业等各方进行沟通协调，促进贸易交易的顺利完成。'
+                    ],
+                    requirements: [
+                        '金融、国际贸易或相关专业的学士学位。',
+                        '具备贸易金融产品知识和操作经验，熟悉国际贸易惯例和相关法规。',
+                        '良好的沟通协调能力、风险意识和解决问题能力。'
+                    ],
+                    salary: '66.7万-90万/年 (美国估计)',
+                    salaryRange: [66.7, 90],
+                    path: ['初级岗位', '高级专员', '贸易金融经理', '部门负责人'],
+                    companies: '商业银行（如中国银行、汇丰银行）、大型贸易公司、供应链金融公司',
+                    cert: 'none'
+                },
+                {
+                    tier: '后台',
+                    title: '供应链分析师',
+                    jd: [
+                        '规划、分析和监控公司的供应链分销，确保产品及时、高效地到达目的地。',
+                        '参与具体项目，如在新国家推出产品或通过识别新路线或供应商降低成本。',
+                        '公司与其（通常是海外）供应商之间的联络人，负责研究合理价格和谈判优惠交易。',
+                        '监控仓库库存并使用SAP等工具跟踪所需产品数量。'
+                    ],
+                    requirements: [
+                        '供应链管理、运营管理或相关领域的学位。',
+                        '具备数据分析、批判性思维和解决问题能力。',
+                        '有效的沟通能力、人际交往能力和组织能力。'
+                    ],
+                    salary: '4.5万-9.6万/年',
+                    salaryRange: [4.5, 9.6],
+                    path: ['初级分析师', '高级分析师', '供应链经理', '供应链总监'],
+                    companies: '京东物流、菜鸟网络、中远海运、顺丰速运、华为、宝洁',
+                    cert: 'none'
+                }
+            ],
+            '跨境电商': [
+                {
+                    tier: '前台',
+                    title: '跨境电商运营专员',
+                    jd: [
+                        '负责跨境电商网站内容的编辑、优化和更新，确保内容准确并符合目标市场需求。',
+                        '撰写和优化产品描述、营销文案和SEO内容，使用PS/Canva等工具进行基础图像编辑。',
+                        '规划和实施基于市场趋势和用户反馈的内容优化策略，与设计和运营团队协作。',
+                        '监控内容表现，分析数据，提出改进建议。',
+                        '学习跨境电商平台各项政策与制度，控制产品风险，保持账号健康稳定。',
+                        '协助主管制定销售计划，处理货品打包和发货相关事宜。'
+                    ],
+                    requirements: [
+                        '学士或更高学位，英语、阿拉伯语、市场营销或相关专业优先。',
+                        '精通英语和阿拉伯语，具备优秀的书面沟通能力。',
+                        '具备基础平面设计技能，有跨境电商或网站编辑经验者优先。',
+                        '熟悉SEO优化技术和搜索引擎排名规则，强大的学习能力、团队精神和对跨境电商行业的热情。'
+                    ],
+                    salary: '6万-18万/年',
+                    salaryRange: [6, 18],
+                    path: ['基层运营', '高级运营专员', '运营主管', '运营经理/部门负责人'],
+                    companies: '京东国际、阿里巴巴国际站、拼多多、常熟伊斯格进出口有限公司、北京亿昌传媒科技有限公司',
+                    cert: 'none'
+                }
+            ]
+        },
+        statistics: {
+            '券商': [
+                {
+                    tier: '中台',
+                    title: '量化研究员',
+                    jd: [
+                        '利用数理统计方法和编程技术，挖掘市场规律，开发量化交易策略。',
+                        '负责策略的回测、优化和实盘跟踪。',
+                        '处理和分析海量金融数据，维护量化投研平台。'
+                    ],
+                    requirements: [
+                        '硕士及以上学历，数学、统计、物理、计算机等顶尖理工科专业。',
+                        '精通Python/C++，具备扎实的算法和数据结构基础。',
+                        '有量化实习或竞赛获奖经历者优先，通过CFA/FRM者优先。'
+                    ],
+                    salary: '30-100万+/年',
+                    salaryRange: [30, 100],
+                    path: ['初级量化研究员', '量化研究员', '资深研究员', '量化投资经理'],
+                    companies: '中信证券、华泰证券、幻方量化',
+                    cert: 'cfa, frm'
+                },
+                {
+                    tier: '中后台',
+                    title: '风险管理岗（量化方向）',
+                    jd: [
+                        '负责量化策略的风险建模、压力测试和绩效归因。',
+                        '监控交易系统和投资组合的风险暴露，设置风控参数。',
+                        '开发和维护风险管理系统和工具。'
+                    ],
+                    requirements: [
+                        '硕士及以上学历，金融工程、统计学、计算机等专业。',
+                        '精通FRM知识体系，熟悉风险计量方法（如VaR）。',
+                        '具备编程能力（Python/R），能处理和分析数据。'
+                    ],
+                    salary: '25-60万/年',
+                    salaryRange: [25, 60],
+                    path: ['风控专员', '量化风控经理', '高级经理', '风控总监'],
+                    companies: '国泰君安、海通证券、头部私募',
+                    cert: 'frm'
+                }
+            ],
+            '基金': [
+                {
+                    tier: '中台',
+                    title: '量化研究员',
+                    jd: [
+                        '挖掘阿尔法/贝塔因子，开发股票、期货、期权等多品种量化策略。',
+                        '协助数据清洗、整理、可视化以及数据库维护。',
+                        '开发及维护量化策略绩效归因系统。'
+                    ],
+                    requirements: [
+                        '顶尖院校硕士及以上学历，数学、统计、计算机等理工科专业。',
+                        '优秀的编程能力（Python/C++）和数据处理能力。',
+                        '在ACM、Kaggle、数学建模等竞赛中获奖者优先。'
+                    ],
+                    salary: '30-100万+/年',
+                    salaryRange: [30, 100],
+                    path: ['初级量化研究员', '量化研究员', '资深研究员', '量化投资经理'],
+                    companies: '博时基金、华夏基金、进化论资产',
+                    cert: 'cfa, frm'
+                },
+                {
+                    tier: '中后台',
+                    title: '风险监督员（量化）',
+                    jd: [
+                        '隶属公司核心风控体系，对量化交易业务进行全周期实时监控。',
+                        '核实基金仓位、持仓结构，及时识别并处置异常交易和风险事件。',
+                    ],
+                    requirements: [
+                        '硕士及以上学历，数学、统计、计算机等专业。',
+                        '具备编程能力，对金融市场和量化交易有一定理解。',
+                        'FRM持证人或考生优先，要求高度的责任心和细致。'
+                    ],
+                    salary: '15-30万/年',
+                    salaryRange: [15, 30],
+                    path: ['风险监督员', '风控分析员', '策略审核岗', '运营管理'],
+                    companies: '博时基金、大型公募基金',
+                    cert: 'frm'
+                }
+            ],
+            '商业银行': [
+                {
+                    tier: '中后台',
+                    title: '数据分析师/数字金融岗',
+                    jd: [
+                        '利用统计建模、数据挖掘等技术，分析客户行为、信贷风险、营销效果等。',
+                        '搭建业务数据报表体系，为决策提供数据支持。',
+                        '参与数字化产品的设计、营销和运营。'
+                    ],
+                    requirements: [
+                        '本科及以上学历，统计、计算机、数学等专业。',
+                        '熟练使用SQL、Python/R等数据分析工具。',
+                        '具备数据敏感度和业务理解能力，善于从数据中发现问题。'
+                    ],
+                    salary: '15-40万/年',
+                    salaryRange: [15, 40],
+                    path: ['数据分析师', '高级数据分析师', '数据科学家', '数据部门负责人'],
+                    companies: '招商银行、平安银行、浦发银行',
+                    cert: 'cfa, frm'
+                }
+            ],
+            '互联网金融': [
+                {
+                    tier: '中台',
+                    title: '数据科学家/风控建模师',
+                    jd: [
+                        '利用机器学习、深度学习等算法构建信用评分、反欺诈、营销响应等模型。',
+                        '负责模型的开发、部署、监控和迭代优化。',
+                        '深入分析海量数据，洞察业务机会和风险点。'
+                    ],
+                    requirements: [
+                        '硕士及以上学历，统计、计算机、人工智能等顶尖专业。',
+                        '扎实的机器学习理论基础和丰富的项目经验。',
+                        '优秀的编程能力和大数据处理能力（如Spark/Hadoop）。'
+                    ],
+                    salary: '35-80万+/年',
+                    salaryRange: [35, 80],
+                    path: ['算法工程师', '数据科学家', '资深数据科学家', '首席科学家'],
+                    companies: '蚂蚁集团、微众银行、京东科技',
+                    cert: 'cfa, frm'
+                }
+            ],
+            '四大咨询': [
+                {
+                    tier: '中台',
+                    title: '数据与分析咨询顾问',
+                    jd: [
+                        '为金融客户提供数据战略、数据治理、数据分析应用等咨询服务。',
+                        '利用数据分析和可视化工具，帮助客户解决商业问题。',
+                        '参与金融机构数字化转型项目，设计和实施数据驱动的解决方案。'
+                    ],
+                    requirements: [
+                        '硕士及以上学历，统计、计算机、数学、商科等复合背景。',
+                        '熟练使用SQL、Python/R、Tableau等分析工具。',
+                        '优秀的商业理解能力、逻辑思维和沟通表达能力。'
+                    ],
+                    salary: '18-45万/年',
+                    salaryRange: [18, 45],
+                    path: ['分析师', '咨询顾问', '高级顾问', '项目经理/合伙人'],
+                    companies: '普华永道、德勤、安永、毕马威',
+                    cert: 'cfa, frm'
+                }
+            ]
         }
-    } else {
-        postings = jobData[currentCollege][currentIndustry] || [];
-    }
+    };
 
-    jobPostingsContainer.innerHTML = '';
-    
-    postings.forEach(job => {
-        const card = document.createElement('div');
-        card.className = 'job-card glass-card rounded-xl overflow-hidden flex flex-col fade-in';
-        card.dataset.jobTitle = job.title;
+    // 获取DOM元素，统一命名以便与上外岗位代码逻辑匹配
+    const collegeSelector = document.getElementById('college-selector');
+    const industryFiltersContainer = document.getElementById('industry-filters'); // 对应上外岗位中的 industry-filters
+    const jobGrid = document.getElementById('job-grid'); // 对应上外岗位中的 job-grid
+    const salaryOverviewChartCanvas = document.getElementById('salaryOverviewChart'); // 对应上外岗位中的 salaryOverviewChart
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modal-content');
+    const closeModalBtn = document.getElementById('close-modal');
 
-        let certHtml = '';
-        if (job.cert) { // Check if cert field exists
-            if (job.cert.includes('cfa')) {
-                certHtml += `<span class="highlight-tag text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">CFA优先</span>`;
-            }
-            if (job.cert.includes('frm')) {
-                certHtml += `<span class="highlight-tag text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">FRM优先</span>`;
-            }
-        }
+    let currentCollege = 'finance'; // 默认学院
+    let currentIndustry = 'all'; // 默认行业筛选为“所有行业”
 
-        const jdContent = Array.isArray(job.jd) ? job.jd.map(item => `<p>${item}</p>`).join('') : `<p>${job.jd}</p>`;
-        const requirementsContent = Array.isArray(job.requirements) ? job.requirements.map(item => `<p>${item}</p>`).join('') : `<p>${job.requirements}</p>`;
-        const pathContent = job.path.map((step, index) => `
-            <span class="path-step-item">${step}</span>
-            ${index < job.path.length - 1 ? '<span class="path-arrow">→</span>' : ''}
+    let salaryOverviewChartInstance = null; // 用于主页薪资概览图表的实例
+    let detailSalaryChartInstance = null; // 用于模态框内薪资图表的实例
+
+    /**
+     * 渲染行业筛选标签
+     */
+    function renderIndustryTags() {
+        const industries = Object.keys(jobData[currentCollege]);
+        // 生成“所有行业”按钮和各行业按钮
+        industryFiltersContainer.innerHTML = `<button class="btn-filter py-2 px-4 rounded-full" data-filter="all">所有行业</button>` + industries.map(industry => `
+            <button class="btn-filter py-2 px-4 rounded-full" data-filter="${industry}">
+                ${industry}
+            </button>
         `).join('');
-
-        card.innerHTML = `
-            <div class="p-5 flex-grow">
-                <div class="flex justify-between items-start mb-2">
-                    <h4 class="text-lg font-bold text-gray-800">${job.title}</h4>
-                    <span class="text-xs font-semibold ${job.tier === '前台' ? 'bg-orange-200 text-orange-800' : (job.tier === '中台' || job.tier === '中后台' ? 'bg-blue-200 text-blue-800' : 'bg-gray-300 text-gray-800')} py-1 px-3 rounded-full shadow-sm whitespace-nowrap">${job.tier}</span>
-                </div>
-                <p class="text-gray-500 font-semibold mb-3 text-sm">${job.companies}</p>
-                <div class="flex flex-wrap gap-1 mb-4">
-                    ${certHtml}
-                </div>
-
-                <div class="mb-3">
-                    <h5 class="font-bold text-gray-700 text-sm mb-1">岗位职责 (JD)</h5>
-                    <div class="jd-content text-sm text-gray-600">${jdContent}</div>
-                </div>
-
-                <div class="mb-3">
-                    <h5 class="font-bold text-gray-700 text-sm mb-1">能力要求</h5>
-                    <div class="requirements-content text-sm text-gray-600">${requirementsContent}</div>
-                </div>
-                
-                <div class="mb-3">
-                    <h5 class="font-bold text-gray-700 text-sm mb-1">发展路径</h5>
-                    <div class="path-content flex flex-wrap items-center text-sm text-primary-accent">
-                        ${pathContent}
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 p-4 text-center border-t border-gray-200 mt-auto">
-                <span class="text-md font-bold text-primary-accent">${job.salary}</span>
-            </div>
-        `;
-        jobPostingsContainer.appendChild(card);
-    });
-}
-
-
-function renderSalaryChart() {
-    const ctx = document.getElementById('salaryChart').getContext('2d');
-    const collegeData = jobData[currentCollege];
-    let chartData = [];
-
-    for (const industry in collegeData) {
-        collegeData[industry].forEach(job => {
-            chartData.push({
-                label: `${job.title} (${industry})`,
-                data: job.salaryRange,
+        
+        // 为新生成的标签添加点击事件监听器
+        industryFiltersContainer.querySelectorAll('.btn-filter').forEach(tag => {
+            tag.addEventListener('click', () => {
+                currentIndustry = tag.dataset.filter;
+                updateActiveStates(); // 更新按钮的激活状态
+                renderJobPostings(); // 重新渲染岗位卡片
+                renderSalaryOverviewChart(); // 更新主页薪资概览图表
             });
         });
     }
 
-    chartData.sort((a, b) => a.data[0] - b.data[0]);
+    /**
+     * 渲染岗位卡片
+     */
+    function renderJobPostings() {
+        let allJobsForCollege = [];
+        // 根据当前选中的行业过滤岗位
+        if (currentIndustry === 'all') {
+            for (const industry in jobData[currentCollege]) {
+                allJobsForCollege = allJobsForCollege.concat(jobData[currentCollege][industry]);
+            }
+        } else {
+            allJobsForCollege = jobData[currentCollege][currentIndustry] || [];
+        }
 
-    if(salaryChartInstance) { // Use the renamed instance variable
-        salaryChartInstance.destroy();
-    }
-    
-    salaryChartInstance = new Chart(ctx, { // Assign to the renamed instance variable
-        type: 'bar',
-        data: {
-            labels: chartData.map(d => d.label.length > 16 ? d.label.substring(0, 15) + '...' : d.label),
-            datasets: [{
-                label: '最低年薪 (万)',
-                data: chartData.map(d => d.data[0]),
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                borderColor: 'rgba(59, 130, 246, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            },
-            {
-                label: '最高年薪 (万)',
-                data: chartData.map(d => d.data[1] - d.data[0]),
-                backgroundColor: 'rgba(30, 58, 138, 0.7)',
-                borderColor: 'rgba(30, 58, 138, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    stacked: true,
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: '年薪范围 (万元)',
-                        font: { size: 14, weight: 'bold' }
+        jobGrid.innerHTML = ''; // 清空之前的岗位卡片
+
+        if (allJobsForCollege.length > 0) {
+            allJobsForCollege.forEach(job => {
+                const card = document.createElement('div');
+                card.className = 'job-card glass-card rounded-xl overflow-hidden flex flex-col';
+                // 将岗位标题存储在dataset中，方便点击时查找对应数据
+                card.dataset.jobTitle = job.title; 
+                card.dataset.jobIndustry = Object.keys(jobData[currentCollege]).find(key => jobData[currentCollege][key].includes(job));
+
+                let certHtml = '';
+                if (job.cert) { // 检查 cert 字段是否存在
+                    if (job.cert.includes('cfa')) {
+                        certHtml += `<span class="highlight-tag text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">CFA优先</span>`;
                     }
-                },
-                y: {
-                    stacked: true,
-                    ticks: {
-                        font: { size: 12 }
+                    if (job.cert.includes('frm')) {
+                        certHtml += `<span class="highlight-tag text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">FRM优先</span>`;
                     }
                 }
+
+                // 统一处理 JD 和 Requirements 为数组或字符串
+                const jdContent = Array.isArray(job.jd) ? job.jd.map(item => `<p>${item}</p>`).join('') : `<p>${job.jd}</p>`;
+                const requirementsContent = Array.isArray(job.requirements) ? job.requirements.map(item => `<p>${item}</p>`).join('') : `<p>${job.requirements}</p>`;
+                
+                // 渲染发展路径
+                const pathContent = job.path.map((step, index) => `
+                    <span class="path-step-item">${step}</span>
+                    ${index < job.path.length - 1 ? '<span class="path-arrow">→</span>' : ''}
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="p-5 flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="text-lg font-bold text-gray-800">${job.title}</h4>
+                            <span class="text-xs font-semibold ${job.tier === '前台' ? 'bg-orange-200 text-orange-800' : (job.tier === '中台' || job.tier === '中后台' ? 'bg-blue-200 text-blue-800' : 'bg-gray-300 text-gray-800')} py-1 px-3 rounded-full shadow-sm whitespace-nowrap">${job.tier}</span>
+                        </div>
+                        <p class="text-gray-500 font-semibold mb-3 text-sm">${job.companies}</p>
+                        <div class="flex flex-wrap gap-1 mb-4">
+                            ${certHtml}
+                        </div>
+
+                        <div class="mb-3">
+                            <h5 class="font-bold text-gray-700 text-sm mb-1">岗位职责 (JD)</h5>
+                            <div class="jd-content text-sm text-gray-600">${jdContent}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <h5 class="font-bold text-gray-700 text-sm mb-1">能力要求</h5>
+                            <div class="requirements-content text-sm text-gray-600">${requirementsContent}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h5 class="font-bold text-gray-700 text-sm mb-1">发展路径</h5>
+                            <div class="path-content flex flex-wrap items-center text-sm text-primary-accent">
+                                ${pathContent}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 text-center border-t border-gray-200 mt-auto">
+                        <span class="text-md font-bold text-primary-accent">${job.salary}</span>
+                    </div>
+                `;
+                jobGrid.appendChild(card);
+            });
+        } else {
+            // 如果没有结果，可以显示一个提示
+            jobGrid.innerHTML = '<p class="text-center text-gray-500 py-8">未找到符合条件的岗位，请尝试其他筛选组合。</p>';
+        }
+    }
+
+    /**
+     * 渲染主页的薪资概览图表
+     */
+    function renderSalaryOverviewChart() {
+        const ctx = salaryOverviewChartCanvas.getContext('2d');
+        let allJobsForChart = [];
+        // 收集当前学院下所有行业的岗位数据
+        for (const industry in jobData[currentCollege]) {
+            allJobsForChart = allJobsForChart.concat(jobData[currentCollege][industry]);
+        }
+
+        let chartData = allJobsForChart.filter(job => job.salaryRange && job.salaryRange.length === 2).map(job => ({
+            label: `${job.title} (${Object.keys(jobData[currentCollege]).find(key => jobData[currentCollege][key].includes(job))})`, // 显示岗位名称及所属行业
+            data: job.salaryRange,
+        }));
+
+        // 按最低年薪排序
+        chartData.sort((a, b) => a.data[0] - b.data[0]);
+
+        // 销毁旧图表实例（如果有）
+        if(salaryOverviewChartInstance) {
+            salaryOverviewChartInstance.destroy();
+        }
+        
+        // 创建新图表实例
+        salaryOverviewChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.map(d => d.label.length > 16 ? d.label.substring(0, 15) + '...' : d.label), // 截断过长的标签
+                datasets: [{
+                    label: '最低年薪 (万)',
+                    data: chartData.map(d => d.data[0]),
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)', /* blue-500 with opacity */
+                    borderColor: 'rgba(59, 130, 246, 1)', /* blue-500 */
+                    borderWidth: 1,
+                    borderRadius: 5,
+                },
+                {
+                    label: '最高年薪 (万)',
+                    data: chartData.map(d => d.data[1] - d.data[0]), // 计算范围差值
+                    backgroundColor: 'rgba(30, 58, 138, 0.7)', /* blue-800 with opacity */
+                    borderColor: 'rgba(30, 58, 138, 1)', /* blue-800 */
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }]
             },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        font: { size: 12 }
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: true,
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '年薪范围 (万元)',
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: {
+                            font: { size: 12 }
+                        }
                     }
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.dataset.label || '';
-                            const low = context.chart.data.datasets[0].data[context.dataIndex];
-                            const high = context.chart.data.datasets[1].data[context.dataIndex] + low;
-                            return `${context.chart.data.labels[context.dataIndex]}: ${low} - ${high}万元`;
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const low = context.chart.data.datasets[0].data[context.dataIndex];
+                                const high = context.chart.data.datasets[1].data[context.dataIndex] + low;
+                                return `${context.chart.data.labels[context.dataIndex]}: ${low} - ${high}万元`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
-}
-
-
-function updateActiveStates() {
-    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
-    if (document.getElementById(`btn-${currentCollege}`)) {
-        document.getElementById(`btn-${currentCollege}`).classList.add('active');
+        });
     }
 
-    document.querySelectorAll('.industry-tag').forEach(tag => {
-        if (tag.dataset.industry === currentIndustry) {
-            tag.classList.add('active');
-        } else {
-            tag.classList.remove('active');
+    /**
+     * 更新学院和行业筛选按钮的激活状态
+     */
+    function updateActiveStates() {
+        // 更新学院按钮状态
+        document.querySelectorAll('#college-selector .btn-filter').forEach(btn => btn.classList.remove('active'));
+        const currentCollegeBtn = document.getElementById(`btn-${currentCollege}`);
+        if (currentCollegeBtn) {
+            currentCollegeBtn.classList.add('active');
         }
-    });
-}
 
-function initialize() {
-    collegeSelector.addEventListener('click', (e) => {
-        const button = e.target.closest('.nav-button');
-        if (!button) return;
+        // 更新行业筛选标签状态
+        document.querySelectorAll('#industry-filters .btn-filter').forEach(tag => {
+            if (tag.dataset.filter === currentIndustry) {
+                tag.classList.add('active');
+            } else {
+                tag.classList.remove('active');
+            }
+        });
+    }
 
-        const collegeMap = {
-            'btn-finance': 'finance',
-            'btn-intltrade': 'intltrade',
-            'btn-statistics': 'statistics'
-        };
-        currentCollege = collegeMap[button.id];
-        
-        currentIndustry = 'all'; // Reset industry filter to 'all' when college changes
-        
+    /**
+     * 初始化函数，在DOM加载完成后执行
+     */
+    function initialize() {
+        // 设置学院选择按钮的事件监听器
+        collegeSelector.addEventListener('click', (e) => {
+            const button = e.target.closest('.btn-filter');
+            if (!button) return; // 如果点击的不是按钮，则退出
+
+            const collegeMap = {
+                'btn-finance': 'finance',
+                'btn-intltrade': 'intltrade',
+                'btn-statistics': 'statistics'
+            };
+            currentCollege = collegeMap[button.id];
+            
+            currentIndustry = 'all'; // 切换学院时，重置行业筛选为“所有行业”
+            
+            renderIndustryTags(); // 重新渲染行业标签
+            updateActiveStates(); // 更新按钮激活状态
+            renderJobPostings(); // 渲染岗位卡片
+            renderSalaryOverviewChart(); // 渲染主页薪资概览图表
+        });
+
+        // 为岗位卡片容器添加事件委托，处理卡片点击事件
+        jobGrid.addEventListener('click', (e) => {
+            const card = e.target.closest('.job-card');
+            if (card) {
+                const jobTitle = card.dataset.jobTitle;
+                const jobIndustry = card.dataset.jobIndustry; // 获取行业信息
+                let job = null;
+                
+                // 根据标题和行业查找对应的岗位数据
+                if (jobData[currentCollege] && jobData[currentCollege][jobIndustry]) {
+                    job = jobData[currentCollege][jobIndustry].find(j => j.title === jobTitle);
+                }
+                
+                if (job) {
+                    openModal(job); // 打开模态框显示详情
+                }
+            }
+        });
+
+        // 页面初始化时，首次渲染
         renderIndustryTags();
         updateActiveStates();
         renderJobPostings();
-        renderSalaryChart();
-    });
+        renderSalaryOverviewChart();
+    }
 
-    // Initial render
-    renderIndustryTags();
-    updateActiveStates();
-    renderJobPostings();
-    renderSalaryChart();
+    /**
+     * 打开模态框并显示岗位详情
+     * @param {object} job - 岗位数据对象
+     */
+    const openModal = (job) => {
+        document.getElementById('modal-title').textContent = job.title;
+        // 使用 innerHTML 渲染岗位职责，支持多段落
+        document.getElementById('modal-jd').innerHTML = Array.isArray(job.jd) ? job.jd.map(item => `<p>${item}</p>`).join('') : `<p>${job.jd}</p>`;
+        document.getElementById('modal-salary-text').textContent = `年薪范围: ${job.salary}`;
+        document.getElementById('modal-companies').textContent = job.companies;
 
-    jobPostingsContainer.addEventListener('click', (e) => {
-        const card = e.target.closest('.job-card');
-        if (card) {
-            const jobTitle = card.dataset.jobTitle;
-            let job = null;
-            
-            // Find the job object in the current college's data
-            for (const industry in jobData[currentCollege]) {
-                const foundJob = jobData[currentCollege][industry].find(j => j.title === jobTitle);
-                if (foundJob) {
-                    job = foundJob;
-                    break;
-                }
-            }
-            
-            if (job) {
-                openModal(job);
-            }
-        }
-    });
-}
+        const skillsContainer = document.getElementById('modal-skills');
+        skillsContainer.innerHTML = job.requirements.map(skill => {
+            const isCert = skill.toLowerCase().includes('cfa') || skill.toLowerCase().includes('frm');
+            return `<span class="px-3 py-1 text-xs rounded-full shadow-sm ${isCert ? 'bg-primary-accent text-white font-bold' : 'bg-gray-200 text-gray-700'}">${skill}</span>`;
+        }).join('');
 
-const modal = document.getElementById('modal');
-const modalContent = document.getElementById('modal-content');
-const closeModalBtn = document.getElementById('close-modal');
-let modalSalaryChartInstance = null; // Renamed for clarity and consistency
+        const pathContainer = document.getElementById('modal-path');
+        pathContainer.innerHTML = job.path.map((step, index) => `
+            <span class="path-step-item">${step}</span>
+            ${index < job.path.length - 1 ? '<span class="path-arrow">→</span>' : ''}
+        `).join('');
 
-const generateCareerPathBtn = document.getElementById('generate-career-path-btn');
-const aiCareerPathLoading = document.getElementById('ai-career-path-loading');
-const aiCareerPathResult = document.getElementById('ai-career-path-result');
+        // 显示模态框
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-95');
+        }, 10);
+        document.body.style.overflow = 'hidden'; // 防止背景滚动
 
-let currentJobForAI = null; // To store the job object for AI generation
+        // 渲染模态框内的薪资图表
+        renderModalSalaryChart(job);
+    };
 
-function openModal(job) {
-    currentJobForAI = job; // Store the job for AI generation
-    
-    document.getElementById('modal-title').textContent = job.title;
-    document.getElementById('modal-jd').innerHTML = Array.isArray(job.jd) ? job.jd.map(item => `<p>${item}</p>`).join('') : `<p>${job.jd}</p>`;
-    document.getElementById('modal-salary-text').textContent = `年薪范围: ${job.salary}`;
-    document.getElementById('modal-companies').textContent = job.companies;
-
-    const skillsContainer = document.getElementById('modal-skills');
-    skillsContainer.innerHTML = job.requirements.map(skill => {
-        const isCert = skill.toLowerCase().includes('cfa') || skill.toLowerCase().includes('frm');
-        return `<span class="px-3 py-1 text-xs rounded-full shadow-sm ${isCert ? 'bg-primary-accent text-white font-bold' : 'bg-gray-200 text-gray-700'}">${skill}</span>`;
-    }).join('');
-
-    const pathContainer = document.getElementById('modal-path');
-    pathContainer.innerHTML = job.path.map((step, index) => `
-        <span class="path-step-item">${step}</span>
-        ${index < job.path.length - 1 ? '<span class="path-arrow">→</span>' : ''}
-    `).join('');
-
-    // Clear previous AI results and hide loading
-    aiCareerPathResult.innerHTML = '';
-    aiCareerPathLoading.classList.add('hidden');
-
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        modalContent.classList.remove('scale-95');
-    }, 10);
-    document.body.style.overflow = 'hidden';
-
-    renderModalSalaryChart(job);
-}
-
-async function generateCareerPathSuggestion() {
-    if (!currentJobForAI) return;
-
-    aiCareerPathLoading.classList.remove('hidden');
-    aiCareerPathResult.innerHTML = ''; // Clear previous results
-
-    const job = currentJobForAI;
-    const prompt = `Given the job title '${job.title}', with the following job description: '${Array.isArray(job.jd) ? job.jd.join(' ') : job.jd}', requirements: '${Array.isArray(job.requirements) ? job.requirements.join(' ') : job.requirements}', and a typical path: '${job.path.join(' -> ')}'. Please provide a more detailed and actionable career progression plan for this role. Include specific skills to acquire, potential certifications (if not already mentioned), and key experiences needed for each step. Format the output as a numbered list of detailed steps.`;
-
-    try {
-        let chatHistory = [];
-        chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-        const payload = { contents: chatHistory };
-        const apiKey = "" // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    /**
+     * 渲染模态框内的薪资图表
+     * @param {object} job - 岗位数据对象
+     */
+    function renderModalSalaryChart(job) {
+        const ctx = document.getElementById('salaryChart').getContext('2d'); // 对应上外岗位中的 salaryChart
         
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        if (result.candidates && result.candidates.length > 0 &&
-            result.candidates[0].content && result.candidates[0].content.parts &&
-            result.candidates[0].content.parts.length > 0) {
-            const text = result.candidates[0].content.parts[0].text;
-            // Replace markdown list with HTML list for better rendering
-            const formattedText = text.split('\n').map(line => {
-                if (line.match(/^\d+\./)) { // Matches numbered list items
-                    return `<p>${line.replace(/^\d+\.\s*/, '')}</p>`;
-                }
-                return `<p>${line}</p>`;
-            }).join('');
-            aiCareerPathResult.innerHTML = formattedText;
-        } else {
-            aiCareerPathResult.innerHTML = '<p class="text-red-500">未能生成职业路径建议，请稍后再试。</p>';
+        // 销毁旧图表实例（如果有）
+        if (detailSalaryChartInstance) {
+            detailSalaryChartInstance.destroy();
         }
-    } catch (error) {
-        console.error('Error generating career path:', error);
-        aiCareerPathResult.innerHTML = '<p class="text-red-500">生成职业路径时发生错误，请检查网络连接或稍后再试。</p>';
-    } finally {
-        aiCareerPathLoading.classList.add('hidden');
-    }
-}
-
-generateCareerPathBtn.addEventListener('click', generateCareerPathSuggestion);
-
-
-function renderModalSalaryChart(job) {
-    const ctx = document.getElementById('modal-salary-chart').getContext('2d');
-    
-    if (modalSalaryChartInstance) { // Use the renamed instance variable
-        modalSalaryChartInstance.destroy();
-    }
-    
-    modalSalaryChartInstance = new Chart(ctx, { // Assign to the renamed instance variable
-        type: 'bar',
-        data: {
-            labels: ['年薪范围 (万元)'],
-            datasets: [{
-                label: '最低年薪',
-                data: [job.salaryRange[0]],
-                backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                borderColor: 'rgba(59, 130, 246, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            }, {
-                label: '薪资上限',
-                data: [job.salaryRange[1] - job.salaryRange[0]],
-                backgroundColor: 'rgba(30, 58, 138, 0.6)',
-                borderColor: 'rgba(30, 58, 138, 1)',
-                borderWidth: 1,
-                borderRadius: 5,
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    stacked: true,
-                    title: { display: true, text: '年薪 (万元)' }
-                },
-                y: {
-                    stacked: true
-                }
+        
+        // 创建新图表实例
+        detailSalaryChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['年薪范围 (万元)'],
+                datasets: [{
+                    label: '最低年薪',
+                    data: [job.salaryRange[0]],
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }, {
+                    label: '薪资上限',
+                    data: [job.salaryRange[1] - job.salaryRange[0]], // 计算范围差值
+                    backgroundColor: 'rgba(30, 58, 138, 0.6)',
+                    borderColor: 'rgba(30, 58, 138, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }]
             },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const low = context.chart.data.datasets[0].data[0];
-                            const high = context.chart.data.datasets[1].data[0] + low;
-                            return `范围: ${low} - ${high}万元`;
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        stacked: true,
+                        title: { display: true, text: '年薪 (万元)' }
+                    },
+                    y: {
+                        stacked: true
+                    }
+                },
+                plugins: {
+                    legend: { display: false }, // 隐藏图例
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const low = context.chart.data.datasets[0].data[0];
+                                const high = context.chart.data.datasets[1].data[0] + low;
+                                return `范围: ${low} - ${high}万元`;
+                            }
                         }
                     }
                 }
             }
+        });
+    }
+
+    /**
+     * 关闭模态框
+     */
+    function closeModal() {
+        modal.classList.add('opacity-0');
+        modalContent.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto'; // 恢复背景滚动
+        }, 300);
+    }
+
+    // 模态框关闭按钮事件监听
+    closeModalBtn.addEventListener('click', closeModal);
+    // 点击模态框背景关闭模态框
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
         }
     });
-}
 
-function closeModal() {
-    modal.classList.add('opacity-0');
-    modalContent.classList.add('scale-95');
-    setTimeout(() => {
-        modal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }, 300);
-}
-
-closeModalBtn。addEventListener('click', closeModal);
-modal。addEventListener('click', (e) => {
-    if (e.target === modal) {
-        closeModal();
-    }
-});
-
-document。addEventListener('DOMContentLoaded', initialize);
+    // DOM内容加载完毕后执行初始化
+    document.addEventListener('DOMContentLoaded', initialize);
 </script>
 
 </body>
